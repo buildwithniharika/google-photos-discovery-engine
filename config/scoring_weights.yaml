@@ -1,0 +1,13 @@
+# Opportunity score weights (PM-editable, decision D8). Must sum to 1.0.
+weights:
+  frequency: 0.20
+  severity: 0.20
+  strategic_fit: 0.20
+  evidence_quality: 0.15
+  product_leverage: 0.15
+  research_value: 0.10
+
+# Composite score bands: High >= high, Medium >= medium, otherwise Low.
+bands:
+  high: 3.8
+  medium: 3.0

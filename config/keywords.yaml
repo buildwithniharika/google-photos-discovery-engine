@@ -1,0 +1,76 @@
+# Stage A prefilter lexicon (architecture Section 7). Matching is case-insensitive.
+# Rule: keep an item if it has >= 1 retrieval_intent term, OR >= 1 search_feature
+# term together with a rating <= negative_rating_max.
+
+rules:
+  negative_rating_max: 3
+
+lexicon:
+  retrieval_intent:
+    - find
+    - finding
+    - can't find
+    - cant find
+    - cannot find
+    - couldn't find
+    - search
+    - searching
+    - looking for
+    - locate
+    - where is
+    - where did
+    - missing
+    - disappeared
+    - lost
+    - get back
+    - retrieve
+    - scroll
+    - scrolling
+
+  vague_memory_cues:
+    - remember
+    - don't remember
+    - forgot
+    - sometime
+    - last year
+    - a while ago
+    - that photo
+    - that picture
+    - that day
+    - trip
+    - vacation
+    - I know it's there
+
+  content_types:
+    - screenshot
+    - receipt
+    - bill
+    - invoice
+    - prescription
+    - document
+    - ID
+    - passport
+    - Aadhaar
+    - ticket
+    - recipe
+    - WhatsApp
+    - meme
+    - video
+
+  search_features:
+    - search bar
+    - face grouping
+    - people
+    - places
+    - map
+    - date
+    - album
+    - Ask Photos
+    - text in photo
+    - OCR
+    - Lens
+
+# Stage B seed exemplars (~40 each), written in Phase 3 (task P3.2).
+seed_exemplars:
+  positive: []
+  negative: []

@@ -1,0 +1,107 @@
+# Taxonomies and enumerations (architecture Section 14).
+# Keys must match the enums in src/discovery/models/schemas.py (enforced by tests).
+
+categories:
+  context_based_retrieval_failure: Context-Based Retrieval Failure
+  time_based_memory_gap: Time-Based Memory Gap
+  screenshot_document_retrieval_failure: Screenshot and Document Retrieval Failure
+  visual_detail_search_failure: Object or Visual Detail Search Failure
+  people_event_association_failure: People and Event Association Failure
+  location_ambiguity: Location Ambiguity
+  life_event_retrieval: Life-Event Retrieval
+  search_trust_breakdown: Search Trust Breakdown
+  other_emergent: Emergent / Other (surfaced by clustering)
+
+content_types:
+  - photo
+  - video
+  - screenshot
+  - receipt_or_bill
+  - prescription_or_medical
+  - id_or_official_document
+  - general_document
+  - ticket_or_booking
+  - recipe_or_info_card
+  - chat_media
+  - meme_or_funny
+  - unknown
+
+cue_types:
+  - situation
+  - place_vague
+  - person
+  - purpose_task
+  - visual_detail
+  - time_range
+  - source_app
+  - life_event
+  - feeling
+  - trip_or_event
+  - text_fragment
+
+forgotten_details:
+  - exact_date
+  - month_or_year
+  - location_name
+  - album_name
+  - file_type
+  - exact_text_in_image
+  - sender
+  - media_kind
+  - search_keyword
+  - people_names
+
+# Ordered as a journey so the dashboard can render a drop-off funnel.
+# not_stated is used when the user doesn't say where retrieval broke down.
+breakdown_points:
+  - query_formulation
+  - no_results
+  - results_irrelevant_or_too_broad
+  - target_not_surfaced
+  - wrong_metadata
+  - browse_fatigue
+  - item_appears_missing
+  - trust_breakdown_gave_up
+  - not_stated
+
+attempt_types:
+  - keyword_search
+  - date_search
+  - location_search
+  - people_search
+  - text_ocr_search
+  - natural_language_query
+  - album_browse
+  - manual_scroll
+  - external_app_check
+  - asked_support
+  - not_stated
+
+emotions:
+  - frustrated
+  - angry
+  - anxious
+  - sad_loss
+  - confused
+  - resigned
+  - neutral
+
+outcomes:
+  - not_found
+  - found_with_difficulty
+  - found
+  - not_stated
+
+retrieval_types:
+  - not_retrieval
+  - general_retrieval
+  - vague_memory_retrieval
+
+excluded_topics:
+  - storage
+  - pricing
+  - backup
+  - sync
+  - sharing
+  - deletion
+  - other

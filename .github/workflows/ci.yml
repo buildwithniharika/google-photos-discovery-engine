@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: discovery
+          POSTGRES_PASSWORD: discovery
+          POSTGRES_DB: discovery_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U discovery"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Schema and ORM tests run against both SQLite and this Postgres service.
+      TEST_DATABASE_URL: postgresql://discovery:discovery@localhost:5432/discovery_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run pytest
+      - name: CLI smoke test
+        run: |
+          uv run discovery --help
+          uv run discovery run-all
+          uv run discovery runs
