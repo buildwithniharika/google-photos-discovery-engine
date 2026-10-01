@@ -47,8 +47,10 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
       - run: uv run pytest
+      # No network calls here: ingestion runs in pipeline.yml / app_store_daily.yml.
       - name: CLI smoke test
         run: |
           uv run discovery --help
-          uv run discovery run-all
+          uv run discovery init-db
+          uv run discovery quality
           uv run discovery runs

@@ -1,0 +1,109 @@
+{
+ "feed": {
+  "entry": [
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/us/reviews/id0"
+     },
+     "name": {
+      "label": "Reviewer 0"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-09-29T21:42:35-07:00"
+    },
+    "im:rating": {
+     "label": "4"
+    },
+    "im:version": {
+     "label": "7.94.0"
+    },
+    "id": {
+     "label": "14609669705"
+    },
+    "title": {
+     "label": "One more thing"
+    },
+    "content": {
+     "label": "When I choose images to delete, it deletes ones next to it sometimes",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/us/review?id=962194608&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   },
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/us/reviews/id0"
+     },
+     "name": {
+      "label": "Reviewer 1"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-09-29T19:01:40-07:00"
+    },
+    "im:rating": {
+     "label": "5"
+    },
+    "im:version": {
+     "label": "7.94.0"
+    },
+    "id": {
+     "label": "14609303478"
+    },
+    "title": {
+     "label": "Google memories"
+    },
+    "content": {
+     "label": "I still keep Google Photos, even though I\u2019m on iPhone because Google memories is the best",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/us/review?id=962194608&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   }
+  ],
+  "id": {
+   "label": "feed"
+  }
+ }
+}

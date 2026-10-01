@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
@@ -18,7 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from discovery.config import AppConfig, load_config
 from discovery.db import init_db, make_engine, make_session_factory, redact_url, session_scope
 from discovery.models.orm import PipelineRunRow
-from discovery.models.schemas import RelevanceResult, RunStatus
+from discovery.models.schemas import RelevanceResult, RunStatus, SourceName
 from discovery.runs import new_run_id, track_stage
 
 app = typer.Typer(
@@ -85,15 +84,70 @@ def _stub(stage: str, phase: int, run_id: str | None, **params: object) -> str:
 # --- pipeline stages ---------------------------------------------------------
 
 
+class QualityFormat(StrEnum):
+    markdown = "markdown"
+    json = "json"
+
+
 @app.command()
 def ingest(
     source: SourceChoice = typer.Option(SourceChoice.all, "--source", "-s"),
-    since: datetime | None = typer.Option(None, help="Only items newer than this date."),
+    since: str | None = typer.Option(
+        None,
+        help="Only items newer than this date (YYYY-MM-DD), or 'last' for the newest stored "
+        "item per source minus the overlap window.",
+    ),
     limit: int | None = typer.Option(None, min=1, help="Max items per source."),
     run_id: str | None = RunIdOption,
 ) -> None:
-    """Fetch raw data from the four sources."""
-    _stub("ingest", 1, run_id, source=source.value, since=since, limit=limit)
+    """Fetch raw data from the four sources into raw_items and items."""
+    from discovery.ingest.runner import ALL_SOURCES, parse_since, run_ingest
+
+    cfg, factory = _context()
+    if not cfg.author_hash_salt:
+        typer.secho(
+            "AUTHOR_HASH_SALT is not set. Add a long random string to .env (local) or the "
+            "GitHub Actions secrets; it is used to hash author names.",
+            fg="red",
+            err=True,
+        )
+        raise typer.Exit(2)
+    try:
+        parse_since(since)
+    except ValueError as exc:
+        raise typer.BadParameter(f"--since: {exc}") from exc
+    run_id = run_id or new_run_id()
+    sources = ALL_SOURCES if source == SourceChoice.all else (SourceName(source.value),)
+    outcomes = run_ingest(
+        cfg, factory, run_id, sources, since=since, limit=limit, salt=cfg.author_hash_salt
+    )
+    for o in outcomes:
+        c = o.counts
+        typer.echo(
+            f"[{o.source.value}] {o.status.value}: fetched={c.get('fetched', 0)} "
+            f"new={c.get('items_new', 0)} updated={c.get('items_updated', 0)} "
+            f"unchanged={c.get('items_unchanged', 0)} skipped={c.get('skipped', {})}"
+        )
+    typer.echo(f"Run id: {run_id}")
+    if all(o.status == RunStatus.FAILED for o in outcomes):
+        raise typer.Exit(1)
+
+
+@app.command()
+def quality(
+    format: QualityFormat = typer.Option(QualityFormat.markdown, "--format", "-f"),
+    out: Path | None = typer.Option(None, dir_okay=False, help="Also write the report here."),
+) -> None:
+    """Data Quality summary: counts per source/platform, date ranges, missing fields."""
+    from discovery.quality import quality_report, render_json, render_markdown
+
+    _, factory = _context()
+    report = quality_report(factory)
+    text = render_json(report) if format == QualityFormat.json else render_markdown(report)
+    typer.echo(text, nl=False)
+    if out:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text, encoding="utf-8")
 
 
 @app.command()

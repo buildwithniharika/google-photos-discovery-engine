@@ -1,4 +1,23 @@
-# Pipeline settings. Secrets (GROQ_API_KEY, DATABASE_URL) never go here; see .env.example.
+# Pipeline settings. Secrets (GROQ_API_KEY, DATABASE_URL, AUTHOR_HASH_SALT) never go here;
+# see .env.example.
+
+http:
+  user_agent: "discovery-research-bot/0.1 (+https://github.com/buildwithniharika/google-photos-discovery-engine)"
+  timeout_seconds: 30
+  max_attempts: 4
+  min_interval_seconds: 1.0           # per host, plus random jitter
+  jitter_seconds: 0.5
+
+ingest:
+  raw_dir: data/raw                   # per-run JSONL snapshots (gitignored)
+  since_overlap_days: 3               # `--since last` re-reads this many days to catch late reviews
+  # Every fetch is checked against robots.txt. A source listed here may fetch a disallowed
+  # URL; the reason is the recorded decision (edge case ING-X-07) and is logged on every run.
+  robots_exceptions:
+    play_store: >-
+      PM decision 2026-10-01: google-play-scraper reads play.google.com/_/PlayStoreUi/data/batchexecute,
+      disallowed by robots.txt ('Disallow: /_'). No allowed endpoint offers bulk reviews; use the
+      library at 1 request/second.
 
 sources:
   play_store:
@@ -7,21 +26,32 @@ sources:
     countries: [in, us, gb, ca, au]
     max_reviews_per_country: 20000
     requests_per_second: 1
+    batch_size: 200
   app_store:
     app_id: "962194608"
+    app_slug: google-photos-backup-edit
     countries: [us, gb, in, ca, au, nz, ie, sg]
-    pages: 10
-    playwright_fallback: false
+    # web: apps.apple.com reviews page (robots-allowed; ~10 reviews per storefront per run).
+    # rss: iTunes RSS feed (~500 per storefront) is disallowed by robots.txt ('Disallow: /*/rss/*')
+    #      and only runs if app_store is added to ingest.robots_exceptions.
+    # PM decision 2026-10-01: web.
+    method: web
+    pages: 10                         # rss only
   google_sheet:
     sheet_id: 1lrAFUCIkTOCN9uje8u_nlxshmWO8yKe3ygSAlwRW28M
     tabs: auto
     column_map: auto
     default_platform: Reddit
+    dayfirst: true                    # ambiguous 03/04/2025 is 3 April (en_IN sheet)
   google_community:
     list_url: "https://support.google.com/photos/threads?hl=en&thread_filter=(category:photos_restore)"
-    max_threads: 3000
+    list_page_size: 200               # threads per list request (server-rendered `max_results`)
+    max_threads: 3000                 # list crawl ceiling
+    max_threads_per_run: 1200         # thread pages per run; ~2 h, inside the 6 h Actions limit
     seconds_between_pages: 2.5
     include_replies: true
+    max_replies: 10
+    selectors: {}                     # override parser class suffixes if the page layout changes
 
 prep:
   languages: [en]

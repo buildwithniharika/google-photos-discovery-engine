@@ -9,7 +9,6 @@ from discovery.db import make_engine, make_session_factory, session_scope
 from discovery.models.orm import PipelineRunRow
 
 STUB_COMMANDS = {
-    "ingest": [],
     "prep": [],
     "classify": [],
     "extract": [],
@@ -40,7 +39,7 @@ def _rows(url: str) -> list[PipelineRunRow]:
 def test_help_lists_all_commands():
     result = runner.invoke(cli.app, ["--help"])
     assert result.exit_code == 0
-    for name in [*STUB_COMMANDS, "run-all"]:
+    for name in [*STUB_COMMANDS, "ingest", "quality", "run-all"]:
         assert name in result.output
 
 
@@ -58,7 +57,20 @@ def test_ingest_validates_source(db_url):
     assert result.exit_code != 0
 
 
-def test_run_all_records_every_stage_under_one_run(db_url):
+class _EmptyConnector:
+    warnings: list = []
+    stats: dict = {}
+
+    def fetch(self, since, limit):
+        return iter(())
+
+
+def test_run_all_records_every_stage_under_one_run(db_url, monkeypatch, tmp_path):
+    from discovery.ingest import runner as ingest_runner
+
+    monkeypatch.setenv("AUTHOR_HASH_SALT", "salt")
+    monkeypatch.setattr(ingest_runner, "build_connector", lambda s, ctx: _EmptyConnector())
+    monkeypatch.setattr(ingest_runner.RawStore, "run_dir", lambda self, source: None)
     result = runner.invoke(cli.app, ["run-all", "--run-id", "full"])
     assert result.exit_code == 0, result.output
     rows = _rows(db_url)
@@ -66,6 +78,7 @@ def test_run_all_records_every_stage_under_one_run(db_url):
     assert {r.stage for r in rows} == {
         "run_all",
         "ingest",
+        *(f"ingest:{s}" for s in ("play_store", "app_store", "google_sheet", "google_community")),
         "prep",
         "classify",
         "extract",
@@ -73,8 +86,8 @@ def test_run_all_records_every_stage_under_one_run(db_url):
         "score",
     }
     run_all = next(r for r in rows if r.stage == "run_all")
-    assert run_all.status == "skipped"
     assert run_all.counts["stages"]["score"] == "skipped"
+    assert run_all.counts["stages"]["ingest"] == "partial"  # every source returned 0 items
 
 
 def test_init_db(db_url):

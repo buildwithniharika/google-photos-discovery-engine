@@ -1,0 +1,41 @@
+name: App Store daily
+
+# The App Store page shows only the latest ~10 reviews per storefront, so a daily run is
+# how iOS reviews accumulate over time.
+on:
+  schedule:
+    - cron: "17 3 * * *" # 03:17 UTC daily
+  workflow_dispatch:
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      AUTHOR_HASH_SALT: ${{ secrets.AUTHOR_HASH_SALT }}
+    steps:
+      - name: Check secrets
+        run: |
+          for name in DATABASE_URL AUTHOR_HASH_SALT; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name secret is not set (Settings > Secrets and variables > Actions)"
+              exit 1
+            fi
+          done
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-dev
+      - run: uv run discovery init-db
+      - run: uv run discovery ingest --source app_store
+      - name: Data quality summary
+        if: always()
+        run: |
+          uv run discovery quality --out quality.md
+          cat quality.md >> "$GITHUB_STEP_SUMMARY"

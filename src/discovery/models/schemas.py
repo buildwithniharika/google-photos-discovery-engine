@@ -27,6 +27,9 @@ class Platform(StrEnum):
     IOS = "iOS"
     REDDIT = "Reddit"
     GOOGLE_COMMUNITY = "Google Community"
+    # Only from the Google Sheet dataset, which also holds YouTube comments and forum pages.
+    YOUTUBE = "YouTube"
+    WEB_FORUM = "Web Forum"
 
 
 class RetrievalType(StrEnum):
@@ -208,6 +211,19 @@ class Item(BaseModel):
     is_spam: bool = False
     similar_count: int = Field(default=0, ge=0)
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @property
+    def analysis_text(self) -> str:
+        """Title + body (+ the original poster's follow-ups for threads): the text the AI
+        stages analyze, before cleaning. `original_text` itself is never modified."""
+        parts: list[str] = []
+        if self.title and not self.original_text.startswith(self.title.strip()):
+            parts.append(self.title.strip())
+        parts.append(self.original_text)
+        parts += [
+            f"[Update from original poster] {t}" for t in self.metadata.get("op_followups", [])
+        ]
+        return "\n\n".join(p for p in parts if p)
 
 
 # --- LLM outputs -------------------------------------------------------------

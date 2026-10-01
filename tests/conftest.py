@@ -16,6 +16,7 @@ def _isolate_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("discovery.config.load_dotenv", lambda *a, **k: False)
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AUTHOR_HASH_SALT", raising=False)
 
 
 @pytest.fixture

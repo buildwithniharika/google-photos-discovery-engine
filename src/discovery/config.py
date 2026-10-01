@@ -24,19 +24,40 @@ class _Strict(BaseModel):
 # --- settings.yaml -----------------------------------------------------------
 
 
+class HttpSettings(_Strict):
+    user_agent: str
+    timeout_seconds: float = Field(default=30, gt=0)
+    max_attempts: int = Field(default=4, ge=1)
+    min_interval_seconds: float = Field(default=1.0, ge=0)
+    jitter_seconds: float = Field(default=0.5, ge=0)
+
+
+class IngestSettings(_Strict):
+    raw_dir: str = "data/raw"
+    since_overlap_days: int = Field(default=3, ge=0)
+    robots_exceptions: dict[str, str] = Field(default_factory=dict)
+
+    @property
+    def raw_path(self) -> Path:
+        p = Path(self.raw_dir)
+        return p if p.is_absolute() else PROJECT_ROOT / p
+
+
 class PlayStoreSettings(_Strict):
     app_id: str
     lang: str = "en"
     countries: list[str]
     max_reviews_per_country: int = Field(gt=0)
     requests_per_second: float = Field(gt=0)
+    batch_size: int = Field(default=200, ge=1, le=200)
 
 
 class AppStoreSettings(_Strict):
     app_id: str
+    app_slug: str = "app"
     countries: list[str]
-    pages: int = Field(ge=1, le=10)
-    playwright_fallback: bool = False
+    method: Literal["web", "rss"] = "web"
+    pages: int = Field(default=10, ge=1, le=10)
 
 
 class GoogleSheetSettings(_Strict):
@@ -44,13 +65,18 @@ class GoogleSheetSettings(_Strict):
     tabs: Literal["auto"] | list[str] = "auto"
     column_map: Literal["auto"] | dict[str, str] = "auto"
     default_platform: str = "Reddit"
+    dayfirst: bool = True
 
 
 class GoogleCommunitySettings(_Strict):
     list_url: str
+    list_page_size: int = Field(default=200, ge=20)
     max_threads: int = Field(gt=0)
+    max_threads_per_run: int = Field(gt=0)
     seconds_between_pages: float = Field(ge=2.0)
     include_replies: bool = True
+    max_replies: int = Field(default=10, ge=0)
+    selectors: dict[str, str] = Field(default_factory=dict)
 
 
 class SourcesSettings(_Strict):
@@ -139,6 +165,8 @@ class ScoringSettings(_Strict):
 
 
 class Settings(_Strict):
+    http: HttpSettings
+    ingest: IngestSettings = Field(default_factory=IngestSettings)
     sources: SourcesSettings
     prep: PrepSettings
     relevance: RelevanceSettings
@@ -239,6 +267,10 @@ class AppConfig(BaseModel):
     @property
     def groq_api_key(self) -> str | None:
         return os.environ.get("GROQ_API_KEY") or None
+
+    @property
+    def author_hash_salt(self) -> str | None:
+        return os.environ.get("AUTHOR_HASH_SALT", "").strip() or None
 
 
 def _read_yaml(path: Path) -> dict:

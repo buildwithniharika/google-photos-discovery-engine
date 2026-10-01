@@ -1,0 +1,69 @@
+name: Pipeline
+
+# Manual for now (Phase 1: ingestion only). Phase 8 adds the weekly schedule and run-all.
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: Source to ingest
+        type: choice
+        default: all
+        options: [all, play_store, app_store, google_sheet, google_community]
+      since:
+        description: "Only items newer than YYYY-MM-DD, or 'last' (empty = everything)"
+        type: string
+        default: ""
+      limit:
+        description: Max items per source (empty = no limit)
+        type: string
+        default: ""
+
+# One ingestion at a time, so this and app_store_daily never write the same rows at once.
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    # Help Community crawls ~1,200 threads per run at 2-3 s/page; resumable across runs.
+    timeout-minutes: 330
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      AUTHOR_HASH_SALT: ${{ secrets.AUTHOR_HASH_SALT }}
+      SOURCE: ${{ inputs.source }}
+      SINCE: ${{ inputs.since }}
+      LIMIT: ${{ inputs.limit }}
+    steps:
+      - name: Check secrets
+        run: |
+          for name in DATABASE_URL AUTHOR_HASH_SALT; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name secret is not set (Settings > Secrets and variables > Actions)"
+              exit 1
+            fi
+          done
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --no-dev
+      - name: Install Chromium (Help Community crawler)
+        if: inputs.source == 'all' || inputs.source == 'google_community'
+        run: uv run playwright install --with-deps chromium
+      - run: uv run discovery init-db
+      - name: Ingest
+        run: |
+          args=(--source "$SOURCE")
+          [ -n "$SINCE" ] && args+=(--since "$SINCE")
+          [ -n "$LIMIT" ] && args+=(--limit "$LIMIT")
+          uv run discovery ingest "${args[@]}"
+      # Aggregate counts only: raw data and debug HTML hold user text and are never uploaded.
+      - name: Data quality summary
+        if: always()
+        run: |
+          uv run discovery quality --out quality.md
+          cat quality.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Recent runs
+        if: always()
+        run: uv run discovery runs --limit 10
