@@ -59,12 +59,12 @@ These items should be resolved in the first 1-2 days, because several phases dep
 | # | Item | Needed by | Owner | Notes |
 |---|---|---|---|---|
 | D1 | **Groq account, API key, and tier** (✅ provider decided: Groq) | Phase 0 (client), Phase 3 | PM + Engineer | Free tier is fine for development; a paid (Developer) tier is recommended for full runs because of daily rate limits. Confirm budget ceiling (expected: well under a few USD per full run). |
-| D2 | **Google Sheet access**: is the dataset sheet publicly viewable (CSV export works), or is a service account needed? | Phase 1 | PM | Also confirm which tabs and columns matter |
+| D2 | **Google Sheet access**: is the dataset sheet publicly viewable (CSV export works), or is a service account needed? (✅ public; one tab, 445 rows, CSV export works) | Phase 1 | PM | Also confirm which tabs and columns matter |
 | D3 | **Google service account** for Sheets export | Phase 8 | Engineer | Can reuse the account from D2; credentials go into Streamlit and GitHub Actions secrets |
 | D4 | **Deployment setup** (✅ decided: Streamlit Community Cloud for the dashboard, GitHub Actions for the pipeline) | Phase 0 | Engineer | Needs a GitHub repository and a Streamlit Community Cloud account linked to it |
 | D4a | **Hosted Postgres provider**: Neon or Supabase (free tier) | Phase 0 | Engineer | Required because Streamlit Community Cloud doesn't keep files written by the app; holds all shared data and PM overrides |
 | D4b | **Dashboard viewers**: email addresses allowed to open the private app | Phase 7 | PM | The app shows user quotes, so it should not be public |
-| D5 | **Scraping review**: confirm `robots.txt` and terms for each source, and agree on rate limits | Phase 1 | Engineer | See architecture Section 18 |
+| D5 | **Scraping review**: confirm `robots.txt` and terms for each source, and agree on rate limits (✅ decided 2026-10-01) | Phase 1 | Engineer | See architecture Section 18. Checked live: Play's review endpoint (`/_/...`) and the iTunes RSS feed (`/*/rss/*`) are disallowed; the App Store page, Sheet CSV export, and Help Community pages are allowed. PM decisions: **Play** uses `google-play-scraper` at 1 request/s as a recorded exception (logged on every run); **App Store** uses only the allowed reviews page (~80 reviews per run across 8 storefronts) |
 | D6 | **Locales/storefronts** to collect (default Play: `in, us, gb, ca, au`; App Store: `us, gb, in, ca, au, nz, ie, sg`) | Phase 1 | PM | Should Hinglish/code-mixed reviews be in scope for Phase 1? Default: flag and count, don't analyze |
 | D7 | **Gold-set labelers**: who hand-labels ~300 items, and when | Phase 2 | PM | About 4-6 hours of labeling, ideally two people for agreement checks |
 | D8 | **Default scoring weights** sign-off | Phase 6 | PM | Defaults: frequency 0.20, severity 0.20, strategic fit 0.20, evidence quality 0.15, product leverage 0.15, research value 0.10 |
@@ -192,43 +192,43 @@ flowchart LR
 
 **Shared**
 
-- [ ] **P1.1** Implement the `SourceConnector` interface (`ingest/base.py`) and the raw store writer: JSONL files locally (`data/raw/{source}/{run_id}/`), `raw_items` table in Postgres when deployed
-- [ ] **P1.2** Implement per-source mappers to the unified `Item` schema (`prep/normalize.py`), including `analysis_text = title + body` for threads and posts
-- [ ] **P1.3** Add a polite HTTP layer: throttling, jitter, identifying User-Agent, retries, timeouts
+- [x] **P1.1** Implement the `SourceConnector` interface (`ingest/base.py`) and the raw store writer: JSONL files locally (`data/raw/{source}/{run_id}/`), `raw_items` table in Postgres when deployed *(`raw_items` holds the latest payload per raw ID; each run also writes an immutable JSONL snapshot; batches of 500 are committed as they arrive, so a block mid-source keeps everything collected so far)*
+- [x] **P1.2** Implement per-source mappers to the unified `Item` schema (`prep/normalize.py`), including `analysis_text = title + body` for threads and posts *(Community: the original poster's follow-up replies are appended as "[Update from original poster] ..."; other replies are stored in metadata only. Edited reviews keep up to 5 previous versions in `metadata.history`)*
+- [x] **P1.3** Add a polite HTTP layer: throttling, jitter, identifying User-Agent, retries, timeouts *(`ingest/http.py`: 1 request/s per host plus jitter, retries on 429/5xx honoring `Retry-After`, and a `robots.txt` check (RFC 9309 wildcards) before every request; see D5)*
 
 **Source 1: Google Play Store** (`ingest/play_store.py`)
 
-- [ ] **P1.4** Fetch reviews via `google-play-scraper` with continuation tokens, `sort=NEWEST`, across configured countries (primary: `in`)
-- [ ] **P1.5** Capture review ID, text, rating, date, thumbs-up count, app version, and developer reply (stored separately)
-- [ ] **P1.6** Support incremental runs with `--since`
+- [x] **P1.4** Fetch reviews via `google-play-scraper` with continuation tokens, `sort=NEWEST`, across configured countries (primary: `in`) *(runs under a recorded `robots.txt` exception, see D5; duplicates across countries are merged into one item with a `countries` list)*
+- [x] **P1.5** Capture review ID, text, rating, date, thumbs-up count, app version, and developer reply (stored separately)
+- [x] **P1.6** Support incremental runs with `--since` *(`--since YYYY-MM-DD`, or `--since last` = newest stored review minus a 3-day overlap; works for every source)*
 
 **Source 2: Apple App Store** (`ingest/app_store.py`)
 
-- [ ] **P1.7** Fetch the iTunes RSS JSON feed (pages 1-10) for each configured storefront
-- [ ] **P1.8** Capture review ID, title, text, rating, version, date, country; hash the author name
-- [ ] **P1.9** Add the Playwright fallback behind a feature flag (off by default)
+- [x] **P1.7** ~~Fetch the iTunes RSS JSON feed (pages 1-10) for each configured storefront~~ *(changed by D5: the RSS feed is disallowed by `robots.txt`, so the default is the `apps.apple.com` reviews page per storefront, which shows ~10 recent reviews. RSS is implemented behind `sources.app_store.method: rss` and only runs with a recorded exception)*
+- [x] **P1.8** Capture review ID, title, text, rating, version, date, country; hash the author name *(version is only available from RSS)*
+- [x] **P1.9** ~~Add the Playwright fallback behind a feature flag (off by default)~~ *(not needed: the reviews page is server-rendered and read over plain HTTP)*
 
 **Source 3: Google Sheet dataset** (`ingest/google_sheet.py`)
 
-- [ ] **P1.10** Fetch every tab via CSV export (or `gspread` if D2 requires a service account)
-- [ ] **P1.11** Auto-detect headers and apply the config column map; keep unknown columns in `metadata`
-- [ ] **P1.12** Assign platform per row (Reddit / Google Community / Play Store; default Reddit)
+- [x] **P1.10** Fetch every tab via CSV export (or `gspread` if D2 requires a service account) *(D2: the sheet is public; tabs are discovered from the sheet's HTML view)*
+- [x] **P1.11** Auto-detect headers and apply the config column map; keep unknown columns in `metadata`
+- [x] **P1.12** Assign platform per row (Reddit / Google Community / Play Store; default Reddit) *(the sheet also contains YouTube, Quora, XDA, and Android Central rows, so two platforms were added: `YouTube` and `Web Forum`; see G1)*
 
 **Source 4: Google Photos Help Community** (`ingest/community.py`)
 
-- [ ] **P1.13** Playwright crawler for the `photos_restore` thread list: paginate or scroll, collect thread URLs, skip already-seen thread IDs
-- [ ] **P1.14** Thread page parser: title, original question, date, reply count, "same question" count, top replies (labeled as replies)
-- [ ] **P1.15** Enforce 2-3 seconds between page loads with jitter
+- [x] **P1.13** Playwright crawler for the `photos_restore` thread list: paginate or scroll, collect thread URLs, skip already-seen thread IDs *(the list is server-rendered and supports `max_results`, so it is read over HTTP in one request; only thread pages need Chromium. Up to 1,200 new threads per run, resuming where the previous run stopped)*
+- [x] **P1.14** Thread page parser: title, original question, date, reply count, "same question" count, top replies (labeled as replies) *(replies are labeled `expert`, `op_followup`, or `user`; Google renders recommended/relevant answers twice, and these are de-duplicated)*
+- [x] **P1.15** Enforce 2-3 seconds between page loads with jitter *(2.5 s + up to 0.5 s jitter)*
 
 **Testing**
 
-- [ ] **P1.16** Recorded HTTP/HTML fixtures for each connector; unit tests for every mapper
-- [ ] **P1.17** Data Quality summary command: counts per source, platform, date range, and missing-field rates
+- [x] **P1.16** Recorded HTTP/HTML fixtures for each connector; unit tests for every mapper *(anonymized fixtures in `tests/fixtures/ingest/`; 219 tests, no network)*
+- [x] **P1.17** Data Quality summary command: counts per source, platform, date range, and missing-field rates *(`discovery quality`, Markdown or JSON; flags sources below the volume targets)*
 
 **Running in GitHub Actions**
 
-- [ ] **P1.18** First version of `pipeline.yml`: install dependencies and Playwright's Chromium, run `discovery ingest --source all` against hosted Postgres, on manual trigger
-- [ ] **P1.19** `app_store_daily.yml`: daily App Store ingestion (start early so iOS reviews accumulate)
+- [x] **P1.18** First version of `pipeline.yml`: install dependencies and Playwright's Chromium, run `discovery ingest --source all` against hosted Postgres, on manual trigger *(inputs: source, since, limit; the Data Quality summary is written to the run page. Needs the `AUTHOR_HASH_SALT` secret in addition to `DATABASE_URL`)*
+- [x] **P1.19** `app_store_daily.yml`: daily App Store ingestion (start early so iOS reviews accumulate) *(03:17 UTC daily; shares a concurrency group with `pipeline.yml`)*
 
 ### Deliverables
 
@@ -238,10 +238,20 @@ flowchart LR
 
 ### Acceptance criteria
 
-- [ ] All four connectors complete a run, both locally and in GitHub Actions; a failure in one source does not stop the others
-- [ ] Every item has: source name, source URL, platform, original text; plus date and rating where the source provides them
-- [ ] Re-running ingestion with `--since` adds only new items
-- [ ] Target volumes (adjust after G1): Play Store ≥ 20,000 reviews; App Store ≥ 2,000 reviews (across storefronts); all Google Sheet rows; Community ≥ 1,000 threads
+- [x] All four connectors complete a run, both locally and in GitHub Actions; a failure in one source does not stop the others *(GitHub Actions full run `2026-10-01T115154_e491da`: all four `completed` in 73 min. Locally: every connector run against SQLite. Isolation covered by tests: a crashing source is `failed`, a source returning 0 items is `partial`, and the others continue)*
+- [x] Every item has: source name, source URL, platform, original text; plus date and rating where the source provides them *(checked in Neon: 0 items missing URL, platform, or text. Date missing only for 24% of Sheet rows (YouTube relative dates, forum page captures); rating present for every Play/App Store review)*
+- [x] Re-running ingestion with `--since` adds only new items *(`ingest --source play_store --since last` twice in a row: second run 0 new, 4,839 unchanged)*
+- [ ] Target volumes (adjust after G1): Play Store ≥ 20,000 reviews; App Store ≥ 2,000 reviews (across storefronts); all Google Sheet rows; Community ≥ 1,000 threads *(Play 20,000 ✅; Sheet all 445 rows (437 items, 8 rows with no text) ✅; Community 1,204 ✅; **App Store 80 ❌**: the robots-allowed page shows ~10 reviews per storefront, so `app_store_daily.yml` adds only new reviews each day. See G1)*
+
+**Phase 1 results (Oct 1, 2026, hosted Postgres):** 21,721 items. By platform: Android 20,193, Google Community 1,223, Reddit 187, iOS 82, Web Forum 31, YouTube 5. Date ranges: Play 2026-07-14 to 09-30, Community 2026-08-15 to 10-01, App Store 2017-09 to 2026-09, Sheet 2016-09 to 2026-09.
+
+**For the G1 review:**
+
+1. **App Store volume:** 80 vs 2,000. Options: accept and let the daily job accumulate (~5-20 new per day), add more storefronts, or record a robots exception for the RSS feed (~500 per storefront, ~4,000 total).
+2. **Play countries return identical reviews:** all 5 countries returned the same 20,000 reviews (80,000 duplicates), so extra countries add requests but no data. Suggest one country (`in`) and raising `max_reviews_per_country` if more history is wanted (20,000 newest reviews = 2.5 months).
+3. **Play reviews are mostly very short:** 63% are under 20 characters (median 11, e.g. "Good app"). Expect the Phase 2-3 filters to drop most of them.
+4. **Community history:** the 1,200 newest `photos_restore` threads cover only 6 weeks; each later run adds up to 1,200 more (list ceiling `max_threads: 3000`).
+5. **Sheet contents:** besides Reddit/Play/Community, the sheet has YouTube (5) and web forum page captures (Quora, XDA, Android Central; 31) rows, mapped to two new platforms. 3 forum rows were blocked pages (403), so they fall back to the sheet's snippet. Forum captures include site navigation text that Phase 2 cleaning must strip.
 
 ### 🚦 Gate G1: Data review (PM)
 
@@ -711,9 +721,9 @@ Update this table as phases complete.
 
 | Phase | Status | Start | End | Gate passed | Notes |
 |---|---|---|---|---|---|
-| Prerequisites (D1-D8) | In progress | 2026-10-01 | | — | D1 (Groq, free tier), D4 (Streamlit deployment), D4a (Neon) decided |
+| Prerequisites (D1-D8) | In progress | 2026-10-01 | | — | D1 (Groq, free tier), D2 (Sheet public), D4 (Streamlit deployment), D4a (Neon), D5 (robots review) decided |
 | 0 Foundations | Done | 2026-10-01 | 2026-10-01 | — | All tasks and acceptance criteria met; Groq free tier caps runs at ~1K calls/day |
-| 1 Data Ingestion | Not started | | | G1 ☐ | |
+| 1 Data Ingestion | Done (awaiting G1) | 2026-10-01 | 2026-10-01 | G1 ☐ | 21,721 items in Neon from a full GitHub Actions run; App Store at 80 of 2,000 (robots-compliant page only); 5 points listed for G1 |
 | 2 Prep and Gold Set | Not started | | | — | |
 | 3 Relevance Funnel | Not started | | | G2 ☐ | |
 | 4 Insight Extraction | Not started | | | G3 ☐ | |
