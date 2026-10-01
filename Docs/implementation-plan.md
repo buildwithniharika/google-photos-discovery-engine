@@ -152,7 +152,7 @@ flowchart LR
 
 ### Tasks
 
-- [x] **P0.1** Initialize the GitHub repo with `uv` (or Poetry), Python 3.11+, `pyproject.toml`, `.gitignore` (including `data/`, `.env`, `.streamlit/secrets.toml`), `.env.example`, `.streamlit/secrets.toml.example` *(local git repo initialized; GitHub remote not yet created)*
+- [x] **P0.1** Initialize the GitHub repo with `uv` (or Poetry), Python 3.11+, `pyproject.toml`, `.gitignore` (including `data/`, `.env`, `.streamlit/secrets.toml`), `.env.example`, `.streamlit/secrets.toml.example` *(public repo: [buildwithniharika/google-photos-discovery-engine](https://github.com/buildwithniharika/google-photos-discovery-engine))*
 - [x] **P0.2** Create the folder structure from architecture Section 4 (`src/discovery/`, `dashboard/`, `config/`, `prompts/`, `tests/`, `data/`, `.github/workflows/`, `.streamlit/`)
 - [x] **P0.3** Write `config/settings.yaml`, `config/taxonomy.yaml`, `config/scoring_weights.yaml`, `config/keywords.yaml` (initial lexicon from architecture Section 7), and a typed config loader (`config.py`)
 - [x] **P0.4** Define Pydantic schemas (`models/schemas.py`): `RawItem`, `Item`, `RelevanceResult`, `Insight`, `Cluster`, `OpportunityArea`, `OpportunityScore`, `PMOverride`
@@ -161,8 +161,8 @@ flowchart LR
 - [x] **P0.7** Build the Typer CLI skeleton (`cli.py`) with stub commands: `ingest`, `prep`, `classify`, `extract`, `cluster`, `score`, `export`, `run-all`, `eval`
 - [x] **P0.8** Set up `pytest`, linting (`ruff`), and the GitHub Actions CI workflow (`ci.yml`: lint + tests)
 - [x] **P0.9** Implement `pipeline_runs` logging: each CLI command records start, end, status, counts, and errors
-- [ ] **P0.10** Provision hosted Postgres (decision D4a); add `GROQ_API_KEY` and `DATABASE_URL` as GitHub Actions secrets; run table creation against Postgres *(ready: `db_init.yml` workflow and `discovery init-db`; needs the Neon/Supabase database and GitHub repo)*
-- [ ] **P0.11** Confirm the Groq account's rate limits for the chosen models and set `requests_per_minute` and `max_concurrency` in `config/settings.yaml` *(defaults set to Groq's published free-tier limits; confirm against the account's Limits page)*
+- [x] **P0.10** Provision hosted Postgres (decision D4a); add `GROQ_API_KEY` and `DATABASE_URL` as GitHub Actions secrets; run table creation against Postgres *(Neon project `google-photos-discovery-engine`, Postgres 18, `aws-us-east-2`, database `discovery`, pooled connection; both secrets set; all 14 tables created locally via `discovery init-db` and from GitHub Actions via the `Initialize database` workflow)*
+- [x] **P0.11** Confirm the Groq account's rate limits for the chosen models and set `requests_per_minute` and `max_concurrency` in `config/settings.yaml` *(confirmed 2026-10-01 from the account's `x-ratelimit-*` headers: free tier, both models 1K requests/day and 8K tokens/min, plus Groq's published 30 RPM; pinned per model at 28 RPM / 7,500 TPM with `max_concurrency: 2`. Tokens/min is the binding limit (~11 calls/min); 1K requests/day means a full run (~4,500 calls) needs the Developer plan or several days)*
 
 > **Model change (Oct 2026):** Groq moved `llama-3.1-8b-instant` and `llama-3.3-70b-versatile` to Enterprise-only. Defaults are now `openai/gpt-oss-20b` (small) and `openai/gpt-oss-120b` (large), both with strict JSON Schema support. Later phases that name Llama models should read these as "small model" / "large model" from `config/settings.yaml`.
 
@@ -175,10 +175,10 @@ flowchart LR
 ### Acceptance criteria
 
 - [x] `discovery --help` works; every stub command exits cleanly
-- [x] Database tables match architecture Section 13.2, in both SQLite and Postgres *(verified locally against Postgres 16; hosted Postgres pending P0.10)*
-- [ ] A repeated identical Groq call is served from the cache (zero new tokens) *(passes in unit tests; live check `discovery llm-check` needs `GROQ_API_KEY`)*
-- [ ] A burst of test calls stays within Groq rate limits (no unhandled 429 errors) *(passes in unit tests; live check `discovery llm-check --burst 40` needs `GROQ_API_KEY`)*
-- [ ] CI passes on GitHub Actions on an empty test suite plus schema tests *(136 tests and lint pass locally; needs the GitHub repo)*
+- [x] Database tables match architecture Section 13.2, in both SQLite and Postgres *(verified against local Postgres 16 and hosted Neon Postgres 18)*
+- [x] A repeated identical Groq call is served from the cache (zero new tokens) *(live `discovery llm-check` on both models: second call `cached=True`, 0 tokens)*
+- [x] A burst of test calls stays within Groq rate limits (no unhandled 429 errors) *(live `discovery llm-check --burst 40`: 40 calls, 0 failures, 11.4 req/min, $0.0035)*
+- [x] CI passes on GitHub Actions on an empty test suite plus schema tests *(first push: lint + tests green)*
 
 ---
 
@@ -711,8 +711,8 @@ Update this table as phases complete.
 
 | Phase | Status | Start | End | Gate passed | Notes |
 |---|---|---|---|---|---|
-| Prerequisites (D1-D8) | In progress | 2026-10-01 | | — | D1 (Groq) and D4 (Streamlit deployment) decided |
-| 0 Foundations | In progress | 2026-10-01 | | — | P0.1-P0.9 done; P0.10-P0.11 need Groq key, hosted Postgres, GitHub repo |
+| Prerequisites (D1-D8) | In progress | 2026-10-01 | | — | D1 (Groq, free tier), D4 (Streamlit deployment), D4a (Neon) decided |
+| 0 Foundations | Done | 2026-10-01 | 2026-10-01 | — | All tasks and acceptance criteria met; Groq free tier caps runs at ~1K calls/day |
 | 1 Data Ingestion | Not started | | | G1 ☐ | |
 | 2 Prep and Gold Set | Not started | | | — | |
 | 3 Relevance Funnel | Not started | | | G2 ☐ | |
