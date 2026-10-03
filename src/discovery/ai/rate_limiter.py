@@ -1,4 +1,4 @@
-"""Client-side rate limiting for Groq: request and token buckets plus a concurrency cap."""
+"""Client-side LLM rate limiting: request and token buckets plus a concurrency cap."""
 
 from __future__ import annotations
 

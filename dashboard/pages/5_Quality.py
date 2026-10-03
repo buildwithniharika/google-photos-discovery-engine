@@ -65,6 +65,14 @@ if quality["runs"]:
 else:
     st.caption("No pipeline runs recorded yet.")
 
+st.subheader("Runs that were not published")
+if not quality.get("publish_notes"):
+    st.caption("No failed publish checks in the recent history.")
+for note in quality.get("publish_notes") or []:
+    st.markdown(f"**{note['status']}** · `{note['run_id']}`")
+    for message in note["messages"]:
+        st.warning(str(message)[:500])
+
 st.subheader("Source ingestion and errors")
 if not quality["ingest"]:
     st.caption("No ingest stages recorded.")

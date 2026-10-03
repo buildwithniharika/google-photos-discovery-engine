@@ -12,7 +12,7 @@ from discovery.db import normalize_url, redact_url
 
 def test_config_loads(cfg):
     llm = cfg.settings.llm
-    assert llm.provider == "groq"
+    assert llm.provider == "anthropic"
     assert llm.small_model and llm.large_model
     assert llm.max_concurrency >= 1
     assert llm.rate_limit_for("some/unknown-model") == llm.rate_limits["default"]

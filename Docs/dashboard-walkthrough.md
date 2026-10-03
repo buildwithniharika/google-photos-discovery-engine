@@ -32,7 +32,7 @@ The chip at the top is the published run. If a newer pipeline run is still going
 | Detail | One area: why it matters, sources, content types, remembered cues, forgotten details, search attempts, where retrieval breaks down, quotes, scores, research questions |
 | Evidence | Searchable quotes and a form to correct one item |
 | Quality | Spend, grounding failures, run history, prep and dedup, and the low-confidence queue |
-| Export | Placeholder. CSV, Sheets, and PDF are Phase 8. The page already shows the run, weights, and filters a later export will stamp |
+| Export | Download CSV or PDF, or write a Google Sheet, for the current run and filters. **Run pipeline now** starts the GitHub Actions pipeline when a token is configured |
 
 A teal **PM** badge means your correction is what the page is showing. The AI value stays in the database next to it.
 

@@ -1,0 +1,204 @@
+item_id,source,gold,predicted,vague_memory_relevance,excluded_topic,excluded_topic_blocks_retrieval,confidence,rationale
+021ff2a722e86e5e1a75fb57c58f1cc1,google_sheet,general_retrieval,not_retrieval,0.0,,,0.96,"User asks about features and settings, not looking for a specific photo."
+0597ef35ec9372331ee7c07aa0ec6e81,app_store,general_retrieval,not_retrieval,0.0,,,0.96,"Complains about search performance and UI, not looking for a specific photo."
+091aaf3cbd83d405282d8f9ccfb3ac72,app_store,general_retrieval,not_retrieval,0.0,,,0.99,"Reports app crash during search, not a retrieval request."
+0ad628c3e33d251d5d9a4d58d218cb16,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.94,User asks to recover a deleted album with no exact deletion date.
+0c35163580407efe1c0deccca710f072,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,User requests restoration of photos removed from locked folder and bin.
+0c8602efe7f1659e608004d76af780ca,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Requests return of a removed face‑zoom feature, not searching for a photo."
+0d90783a3ed4ef1540f05252ed9a073f,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,Complains UI change makes browsing photos difficult.
+119e68d3a4832a5120bf7eb77e299dae,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.97,Requests recovery of permanently deleted items.
+1227f67fa2d76226feeb8fc760281acf,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,User asks to recover photos from trash.
+128cd6d9a025a3de64a294289d7729bd,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Positive feedback about family album, no retrieval request."
+12b4baa5c5f696b6cf0508c3f4d19160,google_sheet,general_retrieval,vague_memory_retrieval,0.85,,,0.92,Forgot original location of files moved out of locked folder.
+13b6f376adb70fa8e6c9eba41094a8a7,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.97,User wants permanently deleted pictures and videos back from recycle bin.
+142101b4bd82e674032836d4e7dfe4f3,app_store,not_retrieval,not_retrieval,0.0,,,0.96,"Complaint about fake notifications, not about finding photos."
+1439b34d73a245915f34f9dade37066c,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Complains about difficulty finding photos after update, no specific item."
+1476270086431397ee7dd9b7bb4a98ef,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,"User requests recovery of all videos from a date range, indicating deletion."
+17d8d579c0dd5a85f8cba25ad56df427,google_community,vague_memory_retrieval,vague_memory_retrieval,0.85,,,0.92,Remembers photos from 2021‑2022 but cannot locate them.
+19c7883a870009d9d7202797ac2b5bfc,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Complaints about UI and difficulty locating sent photos, no specific remembered item."
+1a283820a0fb6a88198ab418e1ffd07a,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Positive review describing features, not seeking any photo."
+1a44b97776b207a3f1102f768ac06784,play_store,not_retrieval,not_retrieval,0.0,,,0.95,"Complaint about edit UI and Magic Eraser, not about finding photos."
+1a8ea62e37d9cfb5b331825c436f2518,play_store,general_retrieval,general_retrieval,0.0,,,0.9,"Requests separate tabs for videos, not a specific retrieval."
+1d63012a64f1684913ff6aabeede287d,google_sheet,not_retrieval,not_retrieval,0.0,,,0.95,"Complains about music overlay in memories, no photo retrieval request."
+1e531812d61d5a3aaeab9063aa2434f7,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,Asks for permanently deleted videos from recycle bin.
+25db201f653ed22d91f557df5af0dab9,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Long‑time user praise, no retrieval request."
+2669b7cc9cdb0c59f92f2c4f8584bd9a,google_sheet,not_retrieval,not_retrieval,0.0,,,0.98,Feedback praises features; no request to find a photo.
+26e7d2b49630d1aff1892c359f59ec6a,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.93,User asks to restore photos that may have been deleted.
+278f4cee305fceb18d622a97f6801dc8,google_community,general_retrieval,vague_memory_retrieval,0.9,,,0.92,"User remembers thousands of photos missing, no precise identifier."
+2804d966d92411f7dcddc49180254b2e,play_store,not_retrieval,not_retrieval,0.0,other,,0.95,"Complains about persistent promotional prompt, not about photo retrieval."
+293c47f71427fecb43ff393ab5883044,play_store,not_retrieval,general_retrieval,0.0,,,0.88,"Videos/images disappearing, user seeks solution, not a specific photo."
+295ae9edc07976689d45a764a2093456,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.94,User wants a video that disappeared; assumes it was deleted.
+29752f630cd8d0a05abff2b923a38a68,app_store,general_retrieval,general_retrieval,0.0,,,0.95,"Criticizes AI search quality, general retrieval issue."
+29b70cd74a6e47ae41690e1876214caf,google_sheet,not_retrieval,not_retrieval,0.0,backup,False,0.94,"Asks about reliability and hiding photos, not searching for a specific item."
+29cde7a6bc5144a729196fc05d5c3b83,play_store,general_retrieval,general_retrieval,0.0,,,0.96,"User asks to find all pictures from 2020‑2024, no specific remembered item."
+2a4d2afea4d8fe3ee40105252f7288cf,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Request to view images not in any album, a feature request, not a specific photo."
+2bce267d4e90affd3bcb4aeb25bcff79,play_store,general_retrieval,general_retrieval,0.0,,,0.93,Complains about difficulty browsing older media.
+2c6532efc86edf7b99ca9473870b0d30,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Positive comment about editing features, no retrieval request."
+2dc4636168dc8e5e29e0f78682212dcc,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,User complains about inability to search AI‑edited photos.
+2e1bc7d6d58e45a505c2f9452fe9662b,google_sheet,vague_memory_retrieval,general_retrieval,0.0,,,0.96,Complains about search filters and inability to locate specific video.
+2e80c0fcf85df49f9d628ff6f5139bb5,play_store,not_retrieval,not_retrieval,0.0,,,0.94,"Question about transferring pictures from Windows 7 via Linux, not retrieval."
+2f137ba738d03138ebcee0b82793210c,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Enthusiastic review, no retrieval intent."
+340b85b843b0b869b9c0ff775583b53c,play_store,not_retrieval,general_retrieval,0.0,,,0.94,"Needs to recover photos after phone reset, no specific item."
+356dc3cb3816d05e52b02207326c86d9,app_store,not_retrieval,not_retrieval,0.0,,,0.98,"Bug report, not about finding a photo."
+358ede779245b2c3ca64d1e8146739c9,google_sheet,not_retrieval,not_retrieval,0.0,,,0.95,"Question about reverse image search, not Google Photos."
+36305e005ff60e5b00e22b2186f81c4b,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"General feature request/feedback, no retrieval request."
+36b03a9eb26eeac4f2f7df46c74e8727,app_store,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.96,User asks to recover photos that were deleted.
+3755908dcb3f1191fa02be3beebc68d5,google_community,general_retrieval,not_retrieval,0.0,deletion,False,0.94,User reports missing screenshots and mentions they are still in recycle bin.
+37cf3338d16333202c8f92744a491def,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,"User reports permanently deleted work photos, seeks recovery."
+3a399267047b98b5efa1e67d61146f99,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.94,"User seeks help to retrieve photos lost due to account deletion, a deletion scenario."
+3ae96630869dac8f71988024d23a0e70,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Issue about payment method, not about retrieving photos."
+3c61a560467b3dcb1a1fc0293e1c53a2,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Complains about overall difficulty finding photos, no specific item mentioned."
+3c63ffd01bc8941f17f3984a5a073dba,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Praise of organization features, no retrieval request."
+3c75300f66e9ee655652549dfc427499,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,Account hacked and photos erased; user seeks recovery of deleted items.
+3d937db58c9d9350e2d361a500303e39,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Question about face grouping behavior, not searching for a photo."
+3f1e82d45c19031eae5e2a2e86508188,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,"Complains about search filters not working, no specific remembered item."
+42019f517718522ed376f271b23e0062,google_sheet,general_retrieval,general_retrieval,0.0,,,0.91,User finds it hard to locate photos; overall organization issue.
+42ab913093d901257dd2474e736be0a2,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.92,,,0.94,Remembers trip video from 2022 but cannot locate it.
+42c3285af8b4571ba56bb919a6b099fc,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"General praise, no retrieval request."
+4658ada63ca2ebffcddcfdf1636c91e1,app_store,not_retrieval,not_retrieval,0.0,,,0.97,"Multiple complaints about privacy, sync, and storage, no photo retrieval request."
+46dfb4a4067eca1c5b78f26c6de9ce24,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,User requests recovery of photos they deleted; falls under deletion category.
+4caa864580faa9609be4a3f1dc8a3c86,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.85,,,0.92,Remembers unseen photos that appear in search but not in library.
+4cd4b114a0b5b43ae5b313d1dc0f6396,play_store,not_retrieval,not_retrieval,0.0,,,0.95,"Complains about photo stacking and AI usage, no specific photo retrieval."
+4e6916d8cf2c1eb8db871a63f1cd6ddd,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,User asks to restore permanently deleted lock‑folder data.
+4f7e72e7cd8190d30c554963023110de,google_sheet,vague_memory_retrieval,general_retrieval,0.0,,,0.93,"User wants to locate recently backed‑up items but lacks exact dates, no specific remembered photo."
+5096b35a100ef2565bf702376e431d08,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.95,Request to recover deleted photos; recovery scenario.
+50d80cd85d905a566e07a58b7192a598,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.92,,,0.94,Remembers specific old photos but cannot locate them.
+51139ea2d993af64016b329390a9c4e3,play_store,general_retrieval,not_retrieval,0.0,,,0.95,"Issue with locked photos sharing, not a retrieval request."
+52f11132e216f4af805fb9e7f531e778,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Provides tips on face grouping, not looking for a specific photo."
+532e1d6525fa4f38cfb9e33d6af89d1f,google_sheet,general_retrieval,general_retrieval,0.0,,,0.96,Complains about inability to find shared albums via search.
+56d35998ceb36a0b04e5901556813df7,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Enthusiastic praise, no retrieval request."
+59e2998dea17d7ebd26790931729d11e,google_sheet,general_retrieval,general_retrieval,0.0,,,0.92,Complaint about search no longer finding any items.
+59efd2a201bbda3f323f2f5deaf11234,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,User deleted photos and asks to recover them.
+5c753c81b49c2efb3c0392c085ce4471,play_store,not_retrieval,not_retrieval,0.0,,,0.95,"Criticizes update frequency, no retrieval intent."
+5da121c10ea49b5b1922e7f48df0e131,google_sheet,general_retrieval,not_retrieval,0.0,,,0.94,"General layout complaint, no specific retrieval request."
+5e8e123b8e15e8e3d7ea6e88fe2c18ec,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"User asks how to use face search, not looking for a specific photo."
+61d0fe50ac577013cedba14c55cf25fb,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,Requests recovery of permanently deleted items.
+62dba129842c3b98eb6efad52c1a1023,play_store,not_retrieval,not_retrieval,0.0,sync,False,0.94,"User complains about sync bugs, not looking for photos."
+641bb402db558c8f17dde871a93e63e1,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,"Request to recover deleted videos, i.e., restoration of removed items."
+64f1efb83293c7862a3fe6eb4e3e6102,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Complains about UI layout, not looking for a specific photo."
+6507791e2d9559b483d5f0152fb7cfe3,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.96,User asks to recover permanently deleted photos.
+67874451fbfca385df250e30e855e6cc,google_sheet,not_retrieval,not_retrieval,0.0,other,,0.96,"User provides a product review, no photo retrieval request."
+6855e7e23aac357cc3b709aa3da1e33c,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,Seeks recovery of permanently deleted videos from specific dates.
+691b39ab9beda2decb48248deb7345ab,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.94,Claims WhatsApp images deleted and not in bin; wants recovery.
+6a15158a272737e0aa8be2cd809b864f,google_community,vague_memory_retrieval,vague_memory_retrieval,0.85,,,0.92,"Remembers videos from April 2023 missing, no precise identifier."
+6b87849be5e145d324f628e28568fc9a,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.94,User asks to restore photos that were deleted from backup.
+6c6a70f06679f7309647330a8796e9a3,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"User only praises the app, no photo-finding request."
+6cce3ec52eac53ee6836c4fb1a91a062,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.97,Request to restore permanently deleted data from recycle bin.
+6d08102b2154d54313d9588ba1ec95fd,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,User asks to recover permanently deleted items from recycle bin.
+6ea50bdd2145d04db8ec60711865011b,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Can't find many uploaded photos after device change, no specific item described."
+6eb8654465a1e206acc3a9565092fea7,google_sheet,not_retrieval,not_retrieval,0.0,,,0.98,"Thank‑you message, no retrieval request."
+7012205df7cc199e2c340a2332edda4e,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,User seeks recovery of photos permanently deleted from internal storage.
+721bbb0f2c3424a7b6c11fb07e8714db,google_sheet,not_retrieval,not_retrieval,0.0,,,0.98,"Generic praise, no request to find a photo."
+730dc22e25d34cf448e5c85c4adfe7fe,google_sheet,not_retrieval,not_retrieval,0.0,sharing,False,0.94,"User seeks to separate mixed accounts, not about finding photos."
+78518b8c99abfc3bb0d7dffe5d53750e,app_store,general_retrieval,not_retrieval,0.0,,,0.94,"User complains about missing location overlay on edited screenshots, not a retrieval issue."
+785bdfbd2f48b389ca8a8cf6f7e28ee5,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Positive feedback, no photo-finding request."
+7a0c3e1c2efbd7c0238a3010e9335bac,play_store,not_retrieval,general_retrieval,0.0,,,0.92,"Multiple feature complaints, no specific remembered item."
+7a121bc4f149b49cb74339acdaaceb48,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Criticizes new search results, no specific photo mentioned."
+7bf2342a978daeedde7da6057600657f,play_store,not_retrieval,not_retrieval,0.0,backup,False,0.91,"Requests HEIC support and album ordering, focuses on backup."
+7d7cbfaf4d44668630e91d6df0abc476,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Statement about checking old media, no request to find anything."
+7d9088708f7e972e37bfa6b301e9e8af,google_sheet,not_retrieval,not_retrieval,0.0,storage,False,0.94,"Question about storage and account switching, not photo retrieval."
+7fc6712f8e09182aa0b4bc8f392ff198,google_community,vague_memory_retrieval,vague_memory_retrieval,0.8,,,0.88,"User notes photos/videos vanished over months, cannot pinpoint items."
+7ffb6a5dce7dde2ff2c55e383f84e6c6,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.93,Photos disappeared due to WhatsApp removal; user requests recovery.
+81850142a82997b274df0efffb8ce5fb,google_sheet,not_retrieval,not_retrieval,0.0,,,0.95,How‑to request for moving photos to device gallery.
+821167f0b02712cc70acc15ad58259f7,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.92,"User wants backup that disappeared from trash, a deletion‑recovery request."
+821f1846bc32f4dde0344d1d621496d8,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"General user experience complaints, no photo-finding request."
+8236c3ddfd3fb18ec29fbab3a5f234b0,google_sheet,not_retrieval,not_retrieval,0.0,,,0.97,"User seeks privacy tips, not trying to locate a photo."
+82a754f8e62473bac16faf54558742ec,google_community,general_retrieval,vague_memory_retrieval,0.9,,,0.92,User remembers screenshot photos exist but cannot locate them.
+82e6c7ffd2748546e0ba1bd08a9994af,google_sheet,not_retrieval,not_retrieval,0.0,sync,False,0.95,Question about safety of deleting synced photos from new device.
+832e510e05b2b8dfecf4edace1b1cadf,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Asks where the Erase feature is, a settings question."
+83ba33faf31dc1d6a35f41586806826c,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Privacy and security complaint, no photo retrieval request."
+84ba6b9ee7de22cf28579616862f6b96,play_store,vague_memory_retrieval,not_retrieval,0.0,storage,False,0.94,"Focuses on storage depletion and trash download issues, not a specific photo."
+86a186aa01158146d8e42d258438a96d,play_store,not_retrieval,not_retrieval,0.0,other,,0.95,"Reports face‑grouping bug, no retrieval request."
+876ce737cabceda0d4ecb9f3d843c42e,play_store,vague_memory_retrieval,not_retrieval,0.0,,,0.95,"Reports edited photos not appearing in share dialogs, no specific item sought."
+877f1a9975646fb2e405d27df26747a6,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,"User deleted from Gallery and lost backed‑up photos, seeks recovery."
+87de847bac18f202ecf1a263c4f5201c,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.95,Requests restoration of a photo deleted from trash.
+8958778d2101b470b76dc4337c30c8bc,google_sheet,general_retrieval,general_retrieval,0.0,,,0.92,Layout change makes finding videos hard; no specific remembered item.
+8c31bc65dd70f606f6df7d6ca255bf90,google_sheet,general_retrieval,not_retrieval,0.0,,,0.95,"Issue with face detection, not a request to locate specific photos."
+8d0942f17fcffb28a7e32a7e4ece88b1,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.93,User seeks pictures from June last year that were not backed up.
+8e1f8cee66143eba758a50c5ae88cf22,play_store,general_retrieval,general_retrieval,0.0,,,0.9,"Missing screenshot save option, no particular item mentioned."
+90a92dbd1a55e3427fbe0a64d9ff9643,google_sheet,general_retrieval,not_retrieval,0.0,,,0.95,"General complaints about download and search, no specific remembered item."
+9198399788a5a88bfd5bc74c340fb898,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.9,,,0.94,"User remembers old photos that vanished, no precise identifiers."
+91af86d2a7bfb4a25afb950f52dcb354,play_store,general_retrieval,general_retrieval,0.0,,,0.91,"User cannot locate photos, complains about UI, no specific item."
+9453f3880ff07711469679733a622ffc,play_store,not_retrieval,general_retrieval,0.0,,,0.9,"AI features disappear after update, no specific photo request."
+94ca222f1e363d1ccbb71860c235d748,google_sheet,not_retrieval,not_retrieval,0.0,,,0.98,"Positive feedback, no retrieval intent."
+94f8a5210a54da3addc35f6e1afe2922,google_sheet,general_retrieval,general_retrieval,0.0,,,0.93,"Complains search returns too many/incorrect results, no specific item."
+969f1fcbb9dc8649c8d91a302d553e82,app_store,not_retrieval,not_retrieval,0.0,storage,False,0.96,"Complaint about storage consuming email space, not photo retrieval."
+96e690e43886180246564b2292651e30,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,App not showing old pictures; general finding issue.
+9db693ee26fad2b62b1c8597a3ab2a22,app_store,general_retrieval,general_retrieval,0.0,,,0.98,"Complains search finds nothing, but no specific remembered item."
+9ddaba709aab9500b48d582608fa7ffe,google_community,vague_memory_retrieval,vague_memory_retrieval,0.9,,,0.93,"Remembers saved messages photos missing, no precise identifier."
+9e3001b25f18f6add7cbe2fcd75a86c7,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,Complaint about search quality; no specific remembered photo described.
+a29ac9ce53f4edc5d38838bdf1d6dff2,google_sheet,general_retrieval,general_retrieval,0.0,,,0.94,Search no longer finds people names; complaint about search quality.
+a382be489de4ad5d2bd0cfa777b6ce3f,google_community,vague_memory_retrieval,vague_memory_retrieval,0.75,,,0.85,Garble but indicates lost photos that need restoration.
+a5dd6654f499f1ade15ac8ee9b5a39c3,google_sheet,not_retrieval,not_retrieval,0.0,,,0.94,"Discusses possible tag limit, not searching for a photo."
+a6a39327cbe24d277869bb5f4c876c6f,google_sheet,not_retrieval,not_retrieval,0.0,backup,False,0.94,"Question about avoiding duplicate backup, not searching for a photo."
+a7f6ac3abf35f5ad2dd0d39a96d2f000,google_sheet,general_retrieval,not_retrieval,0.0,,,0.95,"Complaint about layout grouping, not about finding photos."
+a85f7005b66897989d332b2c05b3444e,google_community,not_retrieval,not_retrieval,0.0,,,0.9,User reports issue but states they have already recovered the photos.
+a9975356d17a3a0eb1819073a65907dc,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Praise for unlimited storage, no retrieval request."
+aa62dd6461d3bcaa09c894b87ce30377,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Positive description of service, no retrieval request."
+ab9c64abc10556e57cba5365205c0292,google_community,general_retrieval,not_retrieval,0.0,deletion,False,0.95,User requests restoration of videos removed by mistake on a specific date.
+ac16eacf5e2e54f03883481657ed9416,google_sheet,not_retrieval,general_retrieval,0.0,,,0.95,"User unable to download saved photos, no particular remembered photo cited."
+adbdcfbe0c4a4f525d2bef56fc1e5ce9,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"User asks about transfer methods and storage, not about finding a photo."
+addb4ba5fbea25b00977de6fade8ee49,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.85,,,0.92,"User can't find previously shared albums, remembers them vaguely."
+adf458bb18e1973375374956a0d4d5ec,google_sheet,not_retrieval,not_retrieval,0.0,backup,False,0.92,User seeks old photos that were never backed up after phone loss.
+b0f07de0e7070038e0b6aef6c0cc9918,app_store,general_retrieval,not_retrieval,0.0,,,0.97,"Complaint about sharing workflow, no request to retrieve a photo."
+b179cad2e58e035e0c2aaeb20ba9afb1,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,User asks to recover deleted photos and videos from trash.
+b247914b11da2aac9b19851d8b7eac97,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,Wants to recover a video they permanently deleted.
+b5bf3031ab619e995f60764dbc4e9b90,google_community,vague_memory_retrieval,vague_memory_retrieval,0.9,,,0.93,"User reports all pre‑2015 pictures vanished, remembers events but no exact hooks."
+b5db2e4e9dc775671607164c010ad2b0,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.96,"User asks to recover photos lost after phone change, i.e., deleted items."
+b6c282e2adaa24d134e6b19810f8b84f,google_sheet,not_retrieval,not_retrieval,0.0,sync,False,0.93,Concern about unexpected sync of old photos to child account.
+b766003bb4736b85ecd18cb5f9be524c,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.92,,,0.94,User remembers missing pet video but cannot locate it; no exact identifier.
+b84c2e6fc58a6dd24362d61aad4ea863,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"General UI/feature criticism, not about finding photos."
+b896129d733dcbc3fea8feabe9c55c19,play_store,not_retrieval,not_retrieval,0.0,backup,False,0.92,"Wishes to prioritize album backup, not a retrieval request."
+b9fc9b10d530b94a403f33a40ce80e91,google_sheet,general_retrieval,general_retrieval,0.0,,,0.93,"User struggles to locate old shared albums, no specific album named."
+bc37f76d83a584ccbf6f5550761cc19e,play_store,not_retrieval,not_retrieval,0.0,,,0.95,"Bug report about UI and editing tools, not about finding photos."
+c1ef9901fb993df2e2d9247d6a3cbe4a,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Complaint about corrupted files, not about finding photos."
+c3c96dd74061bac974fe16b948e12ea3,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Enthusiastic endorsement, no retrieval request."
+c533e70e02d304b3d3c14e8900a9c9b9,play_store,not_retrieval,not_retrieval,0.0,other,,0.94,"Complains about image detection labeling, not about finding photos."
+c5633215c0cd1b763760bcf4505d4fc8,play_store,not_retrieval,general_retrieval,0.0,,,0.9,"Video navigation and editing jumps, no particular remembered item."
+c5cbc4496ef525e65944ec6436cd9cab,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.96,Requests recovery of permanently deleted items from recycle bin.
+c5d2a191354fdf0fcf301bb646021407,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.95,Seeks recovery of photos deleted from Google Photos.
+c6a9ca53116810035eada149101a7bb8,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.85,,,0.91,"Remembers edited photos that disappear, cannot locate them."
+c7264f13897f800a2cb0276815867ffd,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,User requests restoration of deleted photos and videos from trash.
+c8fb0ac7abf4998d83bffbe29d81fdf7,google_community,vague_memory_retrieval,vague_memory_retrieval,0.78,,,0.91,Can't locate photos of a particular person after plan change.
+c9b77d05df059564c13572b620543ce5,app_store,not_retrieval,not_retrieval,0.0,,,0.96,"Feedback on UI and metadata display, not seeking specific photos."
+ca5af1dfe26ba6944f3f1706493d21f0,google_sheet,not_retrieval,not_retrieval,0.0,,,0.95,"Issue with favoriting feature, not searching for a photo."
+cba8401a4760efdfb84cadee6282d8f0,google_community,vague_memory_retrieval,vague_memory_retrieval,0.75,,,0.9,"Wants original screenshot before cropping, only approximate time known."
+ceb0d31f3d9f80386eef533468dec6bc,google_community,not_retrieval,general_retrieval,0.0,,,0.93,"User cannot locate old backed‑up photos, no specific item described."
+d0a0c8c90e7cb9725a129d5108ececa0,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.95,"User reports missing photos/videos after phone switch, seeking recovery of deleted items."
+d0d349956fcb8bc915c7045165dd6105,google_sheet,general_retrieval,general_retrieval,0.0,,,0.96,"Search functionality broken, unable to find anything, no particular photo referenced."
+d179c3fd0b2c46670fb35a9a15cafc51,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.94,User deleted items after disabling backup and seeks restoration.
+d43fdac10aa2759521ce7500b1390912,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.94,User asks to recover long‑deleted photos; recovery request.
+d6714a5bd9bb4f1db67cc3e283e987ae,google_sheet,general_retrieval,vague_memory_retrieval,0.85,,,0.94,"User cannot see any old pictures after update, remembers they existed."
+d8abe4745e9b7014b5eef258d83c44a8,play_store,vague_memory_retrieval,general_retrieval,0.0,,,0.9,"Navigation/sharing issues, not a particular remembered photo."
+db606b73a527c9fe6e284b2967d01999,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.95,,,0.95,"User recalls many photos from 2013‑2018 missing, no exact identifiers."
+db619fd4812f990f3bd4065c0dad6a01,google_sheet,general_retrieval,general_retrieval,0.0,,,0.9,"User cannot see old pictures, a general finding issue."
+deaf6622ff183b6761b277541109ee5c,google_sheet,not_retrieval,general_retrieval,0.0,,,0.93,"User cannot view full library due to limited access, no specific item mentioned."
+df1af45cb31ba955865391a6bc725c3e,google_sheet,vague_memory_retrieval,vague_memory_retrieval,0.92,,,0.94,"Remembers kids photos from notification, cannot locate them precisely."
+dfe3c1b3422bedccb2abff3e90b21088,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Feature request to shuffle albums, not a retrieval issue."
+e1022c2b8d171804316b4f6536f80175,google_community,not_retrieval,not_retrieval,0.0,deletion,False,0.95,Asks to recover photos deleted over 60 days ago.
+e1bbc0435c06dd2744a51440ea70469c,play_store,vague_memory_retrieval,not_retrieval,0.0,pricing,False,0.94,"Mentions subscription cost and edit‑share behavior, not looking for a particular photo."
+e21e243c07b310c8470131549aec657f,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"Question about Google Images search, not about personal photo retrieval."
+e2a9bedfbf53a7c13d5d8e4f9fd4bdc3,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"Statement of having recovered pictures, no request."
+e6236cde654b993b69becd412d4c60ed,play_store,not_retrieval,not_retrieval,0.0,,,0.96,"User shares positive experience, no retrieval request."
+e6a13c0642d8e79ab68b9403d659f486,google_sheet,general_retrieval,general_retrieval,0.0,,,0.96,"User can't see organized collections on other devices, no specific item mentioned."
+e78b7e26390d3337038bd70f852f5095,google_community,vague_memory_retrieval,not_retrieval,0.0,deletion,False,0.93,Accidentally removed photos and wants previously deleted items back.
+e7aea3ef0231cb6b7fc7f776371517a3,google_community,general_retrieval,vague_memory_retrieval,0.9,,,0.94,User remembers missing backed‑up photos/videos but cannot locate them.
+e851d55cf8e770679e6c933018bab718,google_community,vague_memory_retrieval,vague_memory_retrieval,0.8,,,0.91,"Can't find previously shared WhatsApp media, remembers them vaguely."
+e9ad286d918e29755e544b0e9daa470b,app_store,not_retrieval,not_retrieval,0.0,,,0.97,"Pure praise, no request to find or recover photos."
+ea3b5faf30beddcbb8ebc24ae7043e9f,app_store,not_retrieval,not_retrieval,0.0,,,0.94,"Feedback on app usefulness and battery usage, not about finding photos."
+ea7eda9b0dc391628813c7ea15db263b,google_sheet,not_retrieval,not_retrieval,0.0,deletion,False,0.93,"Asks how to restore deleted albums, a recovery request."
+eca0e81a3f93a5d816ee223be9743d30,google_community,general_retrieval,vague_memory_retrieval,0.9,,,0.92,"Duplicate of item 1: many photos missing, no precise reference."
+ed09ade8d68c9d44107eebac7086226f,google_sheet,not_retrieval,general_retrieval,0.0,,,0.94,User asks how to view old photos without naming a specific item.
+ede5a23e0de58dfce27bb0b0e414127b,play_store,not_retrieval,not_retrieval,0.0,,,0.95,"Complaint about duplicate saving and charges, no photo search request."
+eef8221385dd9c5bf2891faae4b7f044,google_community,general_retrieval,vague_memory_retrieval,0.85,,,0.91,"Missing thousands of camera‑album photos, no exact identifiers given."
+f3584a9b06475a2f38ee229a09b306bc,google_community,general_retrieval,not_retrieval,0.0,deletion,False,0.96,"User wants back many photos that were deleted, seeking recovery."
+f47ee2b6869a9ba203f460a9e5247c8d,google_sheet,general_retrieval,vague_memory_retrieval,0.92,,,0.94,Remembers screenshots with certain text but cannot locate them.
+f59e82942f75ec37c10934d3f25ba1de,google_sheet,general_retrieval,not_retrieval,0.0,,,0.96,General questions about editing UI and backup preferences.
+f7270eaf007d5e3fdfcae44c08eb7d62,google_sheet,general_retrieval,general_retrieval,0.0,,,0.93,"Seeking a way to search faces within an album, no specific photo described."
+f81c150ec5eb2f2de7ecd11995f76a2f,google_sheet,not_retrieval,not_retrieval,0.0,other,False,0.96,"Complaint about UI changes, not searching for a photo."
+f9a59f99ed91e66a1a2b7736b49803e8,app_store,not_retrieval,not_retrieval,0.0,,,0.99,"Positive review, no request to find a photo."
+fb5e1b9fecf35b47ff7881c93cdc7f21,google_sheet,not_retrieval,not_retrieval,0.0,,,0.96,"User wants to stop memory notifications, not searching for photos."
+fb9bd41d8335839f74eb0042336b124e,google_sheet,general_retrieval,general_retrieval,0.0,,,0.95,"Search for similar items in editing no longer works, general retrieval issue."
+fbdbf6e8712edc7dafd3a6e93ece0bfd,play_store,vague_memory_retrieval,not_retrieval,0.0,,,0.93,"Describes massive loss of photos over years, but no specific remembered item."
+ff8bb0c192cc4172065feb97f3790865,play_store,general_retrieval,general_retrieval,0.0,,,0.92,"Mentions hidden pictures hard to locate, no specific remembered item."
+ffaa7d905960a449424248641754c401,play_store,not_retrieval,not_retrieval,0.0,,,0.93,"General comment about protection, no specific photo being sought."

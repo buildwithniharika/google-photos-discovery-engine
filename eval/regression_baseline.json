@@ -1,0 +1,21 @@
+{
+  "accepted_at": "2026-10-02",
+  "prompts": {
+    "relevance": "relevance_v5",
+    "extraction": "extraction_v2"
+  },
+  "models": {
+    "small": "claude-sonnet-5-5",
+    "large": "claude-opus-5-5"
+  },
+  "metrics": {
+    "stage_a_recall": 1.0,
+    "stage_ab_recall": 0.96,
+    "stage_c_precision": 0.87,
+    "stage_c_recall": 0.89,
+    "grounding": 1.0,
+    "category_top1": 0.8,
+    "category_top2": 0.947,
+    "not_stated": 0.916
+  }
+}

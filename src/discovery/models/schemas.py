@@ -1,6 +1,6 @@
 """Pydantic schemas shared by every pipeline stage (architecture Sections 5.5, 7, 8, 9, 10, 13).
 
-`RelevanceResult` and `Insight` double as the JSON contracts for Groq structured output,
+`RelevanceResult` and `Insight` double as the JSON contracts for LLM structured output,
 so their field descriptions are written for the model as much as for developers.
 """
 
@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 # --- Enumerations (mirror config/taxonomy.yaml) ------------------------------
 
@@ -260,6 +260,30 @@ class RelevanceResult(BaseModel):
         return self
 
 
+class RelevanceBatchItem(BaseModel):
+    """One classified item inside a batched Stage C response."""
+
+    id: int = Field(description="The number n from the item's <<<FEEDBACK n>>> marker")
+    result: RelevanceResult
+
+    @field_validator("result", mode="before")
+    @classmethod
+    def _derive_is_retrieval(cls, value: object) -> object:
+        # retrieval_type is the label; one inconsistent flag should not fail the whole batch.
+        if isinstance(value, dict) and "retrieval_type" in value:
+            value = {
+                **value,
+                "is_retrieval": value["retrieval_type"] != RetrievalType.NOT_RETRIEVAL.value,
+            }
+        return value
+
+
+class RelevanceBatch(BaseModel):
+    """Stage C response for several feedback items in one call."""
+
+    results: list[RelevanceBatchItem]
+
+
 class RememberedCue(BaseModel):
     cue: str = Field(description="The user's own words for what they remember")
     cue_type: CueType
@@ -297,7 +321,64 @@ class Insight(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
 
+class InsightBatchItem(BaseModel):
+    """One extracted item inside a batched extraction response."""
+
+    id: int = Field(description="The number n from the item's <<<FEEDBACK n>>> marker")
+    insight: Insight
+
+
+class InsightBatch(BaseModel):
+    """Extraction response for one or more feedback items in one call."""
+
+    results: list[InsightBatchItem]
+
+
 # --- Synthesis, scoring, curation --------------------------------------------
+
+
+class ClusterLabel(BaseModel):
+    """LLM label for one cluster of similar retrieval problems (Section 9.1 step 4)."""
+
+    name: str = Field(
+        description="Specific 3-9 word name for the shared retrieval problem: what users try "
+        "to find, the cue they remember, or where finding it fails. Never generic, such as "
+        "'search problems'."
+    )
+    summary: str = Field(description="One sentence: what these users try to find and why it fails")
+    category: Category = Field(
+        description="Best-matching taxonomy category; other_emergent only when none fits"
+    )
+    rationale: str = Field(description="One sentence on why this category fits, or none does")
+    confidence: float = Field(ge=0, le=1)
+
+
+class CitedSentence(BaseModel):
+    text: str = Field(description="One sentence")
+    citations: list[str] = Field(
+        description="Evidence ids (such as E3) of the items that support this sentence"
+    )
+
+
+class ResearchQuestionDraft(BaseModel):
+    question: str = Field(description="One open interview or survey question")
+    evidence_gap: str = Field(
+        description="What the evidence does not tell us that this question would answer"
+    )
+    citations: list[str] = Field(description="Evidence ids of the items that raise this gap")
+
+
+class OpportunitySynthesis(BaseModel):
+    """LLM narrative for one opportunity area (Section 9.2). Every sentence cites items."""
+
+    name: str = Field(description="Specific name for the opportunity area, 3-9 words")
+    summary: list[CitedSentence] = Field(
+        min_length=2, max_length=5, description="User problem summary, 2-5 sentences"
+    )
+    why_it_matters: CitedSentence = Field(
+        description="Why this maps to vaguely remembered photo retrieval"
+    )
+    research_questions: list[ResearchQuestionDraft] = Field(min_length=5, max_length=8)
 
 
 class Cluster(BaseModel):
@@ -318,11 +399,37 @@ class OpportunityArea(BaseModel):
     is_emergent: bool = False
     problem_summary: str
     aggregates: dict[str, Any] = Field(default_factory=dict)
-    research_questions: list[str] = Field(default_factory=list)
+    # {"question", "evidence_gap", "item_ids"} per question.
+    research_questions: list[dict[str, Any]] = Field(default_factory=list)
     status: AreaStatus = AreaStatus.ACTIVE
 
 
 Score = Annotated[float, Field(ge=1, le=5)]
+
+
+class RubricDimension(BaseModel):
+    """One 1-5 rubric score and the sentence that justifies it."""
+
+    score: float = Field(ge=1, le=5)
+    rationale: str
+
+    @field_validator("score")
+    @classmethod
+    def _two_decimals(cls, value: float) -> float:
+        return round(float(value), 2)
+
+    @field_validator("rationale")
+    @classmethod
+    def _sentence(cls, value: str) -> str:
+        text = " ".join(value.split())
+        return text or "No rationale returned."
+
+
+class AreaRubric(BaseModel):
+    """Large-model scores for the two dimensions that are judgments, not counts."""
+
+    product_leverage: RubricDimension
+    research_value: RubricDimension
 
 
 class OpportunityScore(BaseModel):

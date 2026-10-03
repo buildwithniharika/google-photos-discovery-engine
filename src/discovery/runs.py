@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
 
 from discovery.db import session_scope
@@ -50,6 +51,58 @@ class StageRun:
     def add_llm_usage(self, tokens: int, cost_usd: float) -> None:
         self.llm_tokens += tokens
         self.llm_cost_usd += cost_usd
+
+
+def llm_spend_since(factory: sessionmaker[Session], since: datetime | None = None) -> float:
+    """Total LLM cost recorded across all stages started at or after `since` (all if None)."""
+    if since is not None and since.tzinfo is None:
+        since = since.replace(tzinfo=UTC)
+    with session_scope(factory) as s:
+        rows = s.execute(select(PipelineRunRow.started_at, PipelineRunRow.llm_cost_usd)).all()
+    total = 0.0
+    for started, cost in rows:
+        if since is not None and started is not None:
+            started = started if started.tzinfo else started.replace(tzinfo=UTC)
+            if started < since:
+                continue
+        total += cost or 0.0
+    return total
+
+
+def running_stages(
+    factory: sessionmaker[Session],
+    stages: set[str],
+    *,
+    within_hours: float,
+    exclude_run_id: str | None = None,
+) -> list[tuple[str, str, datetime]]:
+    """(run_id, stage, started_at) of runs in `stages` still marked running that started in
+    the last `within_hours`. Older `running` rows are runs that died without finishing."""
+    cutoff = datetime.now(UTC).timestamp() - within_hours * 3600
+    with session_scope(factory) as s:
+        rows = s.execute(
+            select(PipelineRunRow.run_id, PipelineRunRow.stage, PipelineRunRow.started_at).where(
+                PipelineRunRow.status == RunStatus.RUNNING.value,
+                PipelineRunRow.stage.in_(stages),
+            )
+        ).all()
+    found = []
+    for run_id, stage, started in rows:
+        if run_id == exclude_run_id or started is None:
+            continue
+        started = started if started.tzinfo else started.replace(tzinfo=UTC)
+        if started.timestamp() >= cutoff:
+            found.append((run_id, stage, started))
+    return found
+
+
+def save_counts(factory: sessionmaker[Session], stage: StageRun) -> None:
+    """Persist counts while the stage is still running (e.g. a Message Batch id that a
+    later run needs to collect the results)."""
+    with session_scope(factory) as s:
+        row = s.get(PipelineRunRow, (stage.run_id, stage.stage))
+        if row is not None:
+            row.counts = dict(stage.counts)
 
 
 def _write(factory: sessionmaker[Session], stage: StageRun, status: RunStatus, *, start: bool):

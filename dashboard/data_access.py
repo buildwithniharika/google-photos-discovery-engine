@@ -142,6 +142,15 @@ def read_published(session: Session) -> dict[str, Any] | None:
     }
 
 
+def _first_error(stages: list) -> str:
+    for stage in stages:
+        for error in stage.errors or []:
+            message = error.get("message") if isinstance(error, dict) else str(error)
+            if message:
+                return str(message)[:300]
+    return ""
+
+
 def override_token(session: Session) -> int:
     return int(session.scalar(select(func.max(PMOverrideRow.override_id))) or 0)
 
@@ -184,13 +193,14 @@ def read_banner(session: Session, published: dict[str, Any] | None) -> dict[str,
             ),
         }
     if any(stage.status in ("failed", "partial") for stage in stages):
-        return {
-            "kind": "failed",
-            "text": (
-                "A newer pipeline run did not finish. You are still seeing the last "
-                "published run. No partial results are shown."
-            ),
-        }
+        reason = _first_error(stages)
+        text = (
+            "A newer pipeline run did not finish. You are still seeing the last "
+            "published run. No partial results are shown."
+        )
+        if reason:
+            text = f"{text} {reason}"
+        return {"kind": "failed", "text": text}
     if not any(stage.stage == "score" and stage.status == "published" for stage in stages):
         return {
             "kind": "running",
@@ -892,6 +902,18 @@ def read_quality(session: Session) -> dict[str, Any]:
         ],
         "dedup": dedup,
         "ingest": ingest,
+        "publish_notes": [
+            {
+                "run_id": row.run_id,
+                "status": row.status,
+                "messages": [
+                    (error.get("message") if isinstance(error, dict) else str(error))
+                    for error in (row.errors or [])
+                ][:8],
+            }
+            for row in runs
+            if row.stage == "run_all" and row.status in ("failed", "partial") and row.errors
+        ],
         "low_confidence": [
             {
                 "item_id": item_id,

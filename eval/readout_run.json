@@ -1,0 +1,13 @@
+{
+  "run_id": "2026-10-02T102736_d4e5bd",
+  "published_at": "2026-10-02T11:34:17.272951+00:00",
+  "frozen_on": "2026-10-03",
+  "purpose": "Phase 9 discovery readout",
+  "selected_area_id": "oa-69e09da1",
+  "fresh_pipeline_run": "not started",
+  "fresh_run_reason": "Published run is the latest scored run. A later pipeline row (2026-10-02T105937_3aa6e9) is the G4 area review and does not change scores. LLM spend on this database is $8.90 of the $9.00 project cap, so a full re-run would cross decision D1. GitHub Actions was not triggered.",
+  "pdf": "eval/discovery_readout.pdf",
+  "narrative": "Docs/discovery-readout.md",
+  "evidence_review": "eval/readout_deep_dive.md",
+  "interview_guide": "Docs/interview-guide.md"
+}

@@ -1,4 +1,4 @@
-# Opportunity score weights (PM-editable, decision D8). Must sum to 1.0.
+# Opportunity score weights. Signed off 2026-10-02 (decision D8). Must sum to 1.0.
 weights:
   frequency: 0.20
   severity: 0.20

@@ -15,6 +15,7 @@ def _isolate_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Tests never read the developer's .env or hit real services."""
     monkeypatch.setattr("discovery.config.load_dotenv", lambda *a, **k: False)
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AUTHOR_HASH_SALT", raising=False)
 

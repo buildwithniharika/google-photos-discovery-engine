@@ -54,63 +54,136 @@ sources:
     selectors: {}                     # override parser class suffixes if the page layout changes
 
 prep:
-  languages: [en]
+  languages: [en]                   # code-mixed and other languages are flagged and kept out of AI stages (decision D6)
   min_words: 4
-  short_text_words: 12
-  near_dup_jaccard: 0.85
+  short_text_words: 12              # below this, never merge across authors (short-text rule)
+  near_dup_jaccard: 0.85            # MinHash LSH on word 5-shingles, long texts only
+  near_dup_shingle_size: 5
+  spam_min_authors: 5               # identical text, this many authors, no retrieval keyword -> is_spam
+  language_min_words: 6
+  language_confidence: 0.85
+  truncation_head_chars: 1500
 
 relevance:
-  semantic_margin_threshold: 0.05
+  # Tuned on the gold set 2026-10-01 (P3.8). Local bge-small margins sit near zero, so τ is
+  # negative: Stage A+B recall is 95.8% (91/95) at -0.08, and 90.5% would already fail a
+  # higher cutoff. Keep when margin > τ.
+  semantic_margin_threshold: -0.08
   audit_sample_rate: 0.05
+  # Stage C batching (prompt v3+). The ~2K-token system prompt is sent once per batch instead
+  # of once per item, which cuts input tokens per item ~4x (and it is read from the Anthropic
+  # prompt cache after the first call). Output must fit batch_max_output_tokens, which also
+  # covers any thinking tokens.
+  batch_max_items: 8
+  batch_max_chars: 8000
+  batch_max_output_tokens: 4096
+
+extraction:
+  # Prompt extraction_v2. Short items share a call; an insight is ~300-450 output tokens.
+  batch_max_items: 6
+  batch_max_chars: 6000
+  # Output caps also set the worst-case cost the budget guard reserves per call, so keep
+  # them near real need (~450 tokens per insight); a truncated batch is split and retried.
+  batch_max_output_tokens: 5000
+  single_max_output_tokens: 1500
+  long_text_chars: 1500               # P4.4: longer texts go straight to llm.large_model (null = off)
+  escalate_low_confidence: true       # P4.4: re-run below llm.escalate_below_confidence on the large model
+  review_below_confidence: 0.5        # P4.6: low-confidence queue for PM review
+  quote_match_threshold: 95           # P4.3: rapidfuzz score against clean_text
+  batch_api_min_items: 100            # P4.8: backfills of this size use the Message Batches API
+  batch_poll_seconds: 30
+  batch_max_wait_minutes: 180         # longer: stop and resume with `extract --batch-id`
+  est_output_tokens_per_item: 450     # `extract --estimate` only
 
 llm:
-  provider: groq
-  # Llama 3.1 8B / 3.3 70B became Enterprise-only on Groq; GPT-OSS models are the
-  # publicly available production models and support strict JSON Schema output.
+  # Switched from Groq to Anthropic on 2026-10-02: the Groq free tier's 200K tokens/day cap
+  # blocked P3.8 tuning and Developer-tier upgrades were unavailable. Key: ANTHROPIC_API_KEY.
   # Any model change must pass the gold-set regression check before a real run.
-  small_model: openai/gpt-oss-20b
-  large_model: openai/gpt-oss-120b
-  structured_output: json_schema      # json_schema | json_object
-  strict_schema: true                 # strict: true = constrained decoding (GPT-OSS supports it)
-  reasoning_effort: low               # GPT-OSS only: low | medium | high; null to omit
-  temperature: 0
+  provider: anthropic                 # anthropic | groq
+  small_model: claude-sonnet-5-5      # default Stage C / extraction model
+  large_model: claude-opus-5-5        # P3.9 comparison and low-confidence escalation
+  reasoning_effort: low               # Anthropic output_config.effort: low | medium | high | xhigh | max
   max_output_tokens: 2048
   escalate_below_confidence: 0.6
   max_input_chars: 6000
-  max_attempts: 5                     # network / 429 / 5xx retries per call
-  max_retry_wait_seconds: 120         # a longer retry-after means a daily limit is exhausted: stop cleanly
-  max_cost_usd_per_run: 5.0           # budget ceiling; the run stops if exceeded
+  max_attempts: 5                     # network / 429 / 5xx / overloaded retries per call
+  max_retry_wait_seconds: 300         # a longer retry-after stops the stage (resume next run)
+  # Spend guards. Before each call the client adds that call's worst-case cost (full prompt
+  # at the cache-write price + every output token) and refuses it if a limit would be crossed.
+  max_cost_usd_per_run: 1.5           # one Opus gold-set run is ~$0.70–1.00
+  # PM cap: $9.00 total for the whole project (raised from $5 to $8 on 2026-10-02 for Phase 4,
+  # then to $8.50 the same day to finish the corpus after a duplicate run overspent, then to
+  # $9.00 the same day for Phase 5 cluster labels and synthesis on Opus, ~$0.30 with batches).
+  # Counts every llm_cost_usd in pipeline_runs (budget_since: null = all rows, including
+  # ~$0.06 logged at Groq list prices while on the free tier). Raising it needs PM approval.
+  project_budget_usd: 9.0
+  budget_since: null
+  # Spend is recorded when a run ends, so concurrent LLM runs could each spend up to the
+  # limits. A run refuses to start while another LLM stage that started within this many
+  # hours is still `running` (an older `running` row is a run that died). null disables.
+  block_concurrent_runs_hours: 6
   max_concurrency: 2
-  # Per-model limits (Groq enforces them per model). Confirmed 2026-10-01 from the account's
-  # x-ratelimit-* headers: free tier, both models 30 RPM, 1K RPD, 8K TPM, 200K TPD. Values
-  # below keep ~5% headroom. TPM is the binding limit (~850 tokens/call = ~9 calls/min), and
-  # 1K RPD caps a day at ~1,000 calls. On the Developer plan (1K RPM, 250K TPM) raise these
-  # and max_concurrency.
+  # Conservative starting values (Anthropic tier 1 is ~50 RPM and 30K input tokens/min per
+  # model). Confirm from the anthropic-ratelimit-* headers after the first call and raise.
   rate_limits:
     default:
-      requests_per_minute: 28
-      tokens_per_minute: 7500
-    openai/gpt-oss-20b:
-      requests_per_minute: 28
-      tokens_per_minute: 7500
-    openai/gpt-oss-120b:
-      requests_per_minute: 28
-      tokens_per_minute: 7500
-  # USD per 1M tokens, from https://console.groq.com/docs/models (verify on change).
+      requests_per_minute: 45
+      tokens_per_minute: 30000
+  # USD per 1M tokens, from https://docs.anthropic.com/en/docs/about-claude/pricing (Oct 2026;
+  # verify on change). cache_write = 5-minute cache (1.25x input); cache_read = cache hits.
   pricing:
-    openai/gpt-oss-20b: { input: 0.075, output: 0.30 }
-    openai/gpt-oss-120b: { input: 0.15, output: 0.60 }
-  use_batch_api_for_backfill: true
+    claude-sonnet-5-5: { input: 2.0, output: 10.0, cache_write: 2.5, cache_read: 0.2 }
+    claude-opus-5-5: { input: 4.0, output: 20.0, cache_write: 5.0, cache_read: 0.2 }
+  use_batch_api_for_backfill: true    # Anthropic Message Batches API: 50% off, async (P4.8)
+  batch_price_factor: 0.5
 
 database:
   url_env: DATABASE_URL               # Postgres when deployed
   default_url: sqlite:///data/discovery.db
 
 clustering:
+  # Phase 5. Embeds problem_statement + trying_to_find + breakdown_point per insight (P5.1).
   embedding_model: BAAI/bge-small-en-v1.5
-  umap: { n_components: 10, n_neighbors: 15, metric: cosine }
-  hdbscan: { min_cluster_size: 10 }
+  random_state: 42                    # UMAP seed: the same data gives the same clusters
+  only_useful_for_discovery: true     # insights with no usable cue stay unclustered
+  umap: { n_components: 10, n_neighbors: 15, metric: cosine, min_dist: 0.0 }
+  # Without min_samples, HDBSCAN on this corpus collapses into one cluster of ~95% of items
+  # from min_cluster_size 10 up. Tune with `discovery cluster --sweep`.
+  hdbscan: { min_cluster_size: 10, min_samples: 3, cluster_selection_method: eom }
+  # P5.4. bge-small centroids are close in general (pairwise cosine 0.70-0.95 on this
+  # corpus). The plan's 0.8 put six distinct context problems (missing after update, Locked
+  # folder, shared albums, wrong dates, ...) into one 173-item area; up to 0.92 chaining
+  # still merges most of them. 0.93 merges only near-identical clusters (2026-10-02).
+  area_merge_cosine: 0.93
+  match_cosine: 0.9                   # P5.9: keep area ids across runs
+  min_area_items: 10                  # smaller areas are flagged "emerging"
+  label_model: large                  # P5.3: small | large | model id
+  synthesis_model: large              # P5.7-P5.8
+  label_items: 20                     # representative items per label call
+  synthesis_items: 25                 # evidence items per synthesis call
+  min_quotes: 5
+  max_quotes: 8
+  quote_dedup_ratio: 85               # rapidfuzz token_set_ratio: closer quotes are duplicates
+  label_max_output_tokens: 700
+  synthesis_max_output_tokens: 2500
+  batch_api_min_calls: 5              # Message Batches API (50% off) from this many calls
+  batch_poll_seconds: 20
+  batch_max_wait_minutes: 60          # longer: stop and resume with `cluster --batch-id`
 
 scoring:
-  low_evidence_min_items: 10
-  low_evidence_min_quality: 2.5
+  # Phase 6. Formulas are architecture Section 10.1; weights live in scoring_weights.yaml.
+  low_evidence_min_items: 10          # fewer items, or evidence quality below the next line,
+  low_evidence_min_quality: 2.5       # and the area is "Emerging – low evidence" (ranked last)
+  analysis_window_days: null          # SC-13: set days to drop older items; null includes all
+  day_contribution_cap: 0.10          # SC-08: one day counts for at most this share of an area
+  engagement_cap: 100                 # SC-05: per-item cap before log1p (same-question, thumbs)
+  engagement_alpha: 0.15              # frequency boost is at most +15%
+  frequency_raw_weight: 0.5           # rest of the blend is the source-balanced vague share
+  quantile_min_areas: 5               # SC-02: below this, frequency uses fixed share thresholds
+  frequency_fixed_thresholds: [0.02, 0.05, 0.12, 0.25]
+  rubric_model: large                 # P6.5: product leverage and research value
+  rubric_items: 5                     # representative quotes sent with each area
+  rubric_max_output_tokens: 400
+  batch_api_min_calls: 5              # Message Batches API (50% off) from this many areas
+  batch_poll_seconds: 20
+  batch_max_wait_minutes: 30

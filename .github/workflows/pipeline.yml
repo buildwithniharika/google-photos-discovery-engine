@@ -1,43 +1,46 @@
 name: Pipeline
 
-# Manual for now (Phase 1: ingestion only). Phase 8 adds the weekly schedule and run-all.
+# Weekly incremental run, plus a manual trigger. A failed job emails repository
+# collaborators who have Actions failure notifications on (see Docs/deployment-runbook.md).
 on:
+  schedule:
+    - cron: "23 6 * * 1" # Monday 06:23 UTC
   workflow_dispatch:
     inputs:
-      source:
-        description: Source to ingest
-        type: choice
-        default: all
-        options: [all, play_store, app_store, google_sheet, google_community]
       since:
-        description: "Only items newer than YYYY-MM-DD, or 'last' (empty = everything)"
+        description: "Only items newer than YYYY-MM-DD, or last. Empty means a full ingest."
         type: string
-        default: ""
+        default: last
       limit:
         description: Max items per source (empty = no limit)
         type: string
         default: ""
+      skip_regression:
+        description: Skip the gold-set prompt gate (experiments only)
+        type: boolean
+        default: false
 
-# One ingestion at a time, so this and app_store_daily never write the same rows at once.
+# Shared with app_store_daily so a manual run cannot overlap the daily ingest.
 concurrency:
-  group: ingest
+  group: discovery-pipeline
   cancel-in-progress: false
 
 jobs:
-  ingest:
+  run-all:
     runs-on: ubuntu-latest
-    # Help Community crawls ~1,200 threads per run at 2-3 s/page; resumable across runs.
-    timeout-minutes: 330
+    # Community crawl plus the AI stages. GitHub's job limit is 6 hours.
+    timeout-minutes: 360
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       AUTHOR_HASH_SALT: ${{ secrets.AUTHOR_HASH_SALT }}
-      SOURCE: ${{ inputs.source }}
-      SINCE: ${{ inputs.since }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      SINCE: ${{ github.event_name == 'schedule' && 'last' || inputs.since }}
       LIMIT: ${{ inputs.limit }}
+      SKIP_REGRESSION: ${{ github.event_name == 'schedule' && 'false' || inputs.skip_regression }}
     steps:
       - name: Check secrets
         run: |
-          for name in DATABASE_URL AUTHOR_HASH_SALT; do
+          for name in DATABASE_URL AUTHOR_HASH_SALT ANTHROPIC_API_KEY; do
             if [ -z "${!name}" ]; then
               echo "::error::$name secret is not set (Settings > Secrets and variables > Actions)"
               exit 1
@@ -49,16 +52,21 @@ jobs:
           enable-cache: true
       - run: uv sync --locked --no-dev
       - name: Install Chromium (Help Community crawler)
-        if: inputs.source == 'all' || inputs.source == 'google_community'
         run: uv run playwright install --with-deps chromium
       - run: uv run discovery init-db
-      - name: Ingest
+      - name: Run the pipeline
         run: |
-          args=(--source "$SOURCE")
+          args=()
           [ -n "$SINCE" ] && args+=(--since "$SINCE")
           [ -n "$LIMIT" ] && args+=(--limit "$LIMIT")
-          uv run discovery ingest "${args[@]}"
-      # Aggregate counts only: raw data and debug HTML hold user text and are never uploaded.
+          [ "$SKIP_REGRESSION" = "true" ] && args+=(--skip-regression)
+          uv run discovery run-all "${args[@]}"
+      - name: Cost report
+        if: always()
+        run: |
+          if [ -f eval/cost_report.md ]; then
+            cat eval/cost_report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Data quality summary
         if: always()
         run: |
@@ -66,4 +74,7 @@ jobs:
           cat quality.md >> "$GITHUB_STEP_SUMMARY"
       - name: Recent runs
         if: always()
-        run: uv run discovery runs --limit 10
+        run: uv run discovery runs --limit 15
+      - name: Publish check failed
+        if: failure()
+        run: echo "::error::The run was not published. The dashboard still shows the previous run. See Data Quality."

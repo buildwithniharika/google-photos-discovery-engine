@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+import tempfile
+import threading
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -98,3 +100,85 @@ def session_scope(factory: sessionmaker[Session]) -> Iterator[Session]:
         raise
     finally:
         session.close()
+
+
+# Session-level Postgres advisory lock. The same key is used by every pipeline command.
+PIPELINE_LOCK_KEY = 81081081
+
+_lock_guard = threading.Lock()
+_lock_owners: set[str] = set()
+
+
+class PipelineBusy(RuntimeError):
+    """Another pipeline run already holds the database lock."""
+
+
+def _lock_file(engine: Engine) -> Path:
+    database = engine.url.database or ""
+    if not database or database == ":memory:":
+        return Path(tempfile.gettempdir()) / "discovery-pipeline.lock"
+    return Path(database).with_suffix(".pipeline.lock")
+
+
+@contextmanager
+def pipeline_lock(engine: Engine, owner: str) -> Iterator[None]:
+    """One pipeline at a time.
+
+    Postgres uses a session advisory lock, which does not block dashboard reads.
+    SQLite has no advisory locks, so a non-blocking file lock is used instead.
+    The same owner may re-enter (run-all calls ingest, which takes the lock again).
+    """
+    with _lock_guard:
+        if owner in _lock_owners:
+            nested = True
+        else:
+            nested = False
+            _lock_owners.add(owner)
+    if nested:
+        yield
+        return
+
+    conn = None
+    handle = None
+    try:
+        if engine.dialect.name == "postgresql":
+            conn = engine.connect()
+            got = conn.execute(
+                text("SELECT pg_try_advisory_lock(:key)"), {"key": PIPELINE_LOCK_KEY}
+            ).scalar()
+            conn.commit()
+            if not got:
+                raise PipelineBusy(
+                    "Another pipeline run holds the database lock. "
+                    "Wait for it to finish, then start this one."
+                )
+        else:
+            import fcntl
+
+            path = _lock_file(engine)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            handle = path.open("a+")
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                raise PipelineBusy(
+                    "Another pipeline run holds the lock. Wait for it to finish, then start again."
+                ) from exc
+        log.info("Pipeline lock acquired by %s", owner)
+        yield
+    finally:
+        if conn is not None:
+            try:
+                conn.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": PIPELINE_LOCK_KEY})
+                conn.commit()
+            except Exception:
+                log.warning("Could not release the Postgres advisory lock", exc_info=True)
+            conn.close()
+        if handle is not None:
+            import fcntl
+
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            handle.close()
+        with _lock_guard:
+            _lock_owners.discard(owner)
+        log.info("Pipeline lock released by %s", owner)

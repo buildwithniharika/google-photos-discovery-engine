@@ -26,6 +26,24 @@ lexicon:
     - retrieve
     - scroll
     - scrolling
+    # Added so Stage A recall stays at the gold-set target (P3.8, REL-05).
+    - not showing
+    - isn't showing
+    - aren't showing
+    - doesn't show
+    - don't show
+    - won't show
+    - can't see
+    - cannot see
+    - cant see
+    - couldn't see
+    - old pictures
+    - old photos
+    - old picture
+    - old photo
+    - recognizing faces
+    - face detection
+    - not detected
 
   vague_memory_cues:
     - remember
@@ -70,7 +88,91 @@ lexicon:
     - OCR
     - Lens
 
-# Stage B seed exemplars (~40 each), written in Phase 3 (task P3.2).
+# Stage B seed exemplars (P3.2). Original wording, kept separate from the gold set (EVAL-01).
 seed_exemplars:
-  positive: []
-  negative: []
+  positive:
+    - I remember a photo of a small café from a trip but not the month or the café's name, and search only shows beaches.
+    - There is a picture of my daughter's first school day somewhere in Photos. I do not remember the year and scrolling never finds it.
+    - I photographed a document but I cannot remember its name, so search has nothing to go on.
+    - The screenshot of a chat is in my library. I do not remember who sent it or which month.
+    - After the phone restore I need the pictures from my wedding. I know they were backed up but I cannot point to the date.
+    - I can picture the yellow dress from that party and not the date, the city, or who else was in the frame.
+    - A receipt from a hardware store is in Photos. I remember buying paint, not the store name or the day.
+    - The prescription photo is there. I forgot which month the appointment was.
+    - I know I saved a picture of my passport before traveling. I do not remember the album.
+    - There is a video of a concert I went to. I forgot the year and the band name does not bring it up.
+    - I remember a rainy afternoon in a city I cannot name, and the street photo never appears when I search.
+    - The boarding pass screenshot is somewhere. I remember the trip, not the airline or the date.
+    - I took a photo of a recipe card at a friend's house. I do not remember their name or when I visited.
+    - My child's drawing was photographed. I remember it was on the fridge, not the year.
+    - I need the picture of the old kitchen before we renovated. I only remember that the walls were blue.
+    - There is a photo of a dog on a sofa from years ago. I do not remember whose house it was.
+    - I can see the birthday cake in my memory but not which birthday, and search for cake shows the wrong years.
+    - The parking spot photo I took at the airport never comes up. I do not remember the terminal.
+    - I remember a funny picture someone forwarded. I do not remember the words in the image, so text search fails.
+    - A photo of the hotel pool from a holiday is missing. I forgot the country and the month.
+    - I know the video of the baby walking is saved. I do not remember the month, and the people album mixes other videos in.
+    - I photographed a ticket stub. I remember the show felt important, not the venue name.
+    - The picture of my grandparents on a bench exists. I do not remember which visit or which park.
+    - I need the screenshot of a balance from last year. I do not remember the exact day or the figures.
+    - There is a photo of a red scooter I almost bought. I forgot the city and search shows other vehicles.
+    - I remember taking a picture of a whiteboard after a meeting. I do not remember the meeting title.
+    - The photo from the day we moved house is in there. I only remember the boxes, not the date.
+    - I saved a picture of a plant I wanted to identify. I do not remember where I saw it.
+    - A video of fireworks from a festival is saved. I forgot which festival and which year.
+    - I know I have a photo of a cracked phone screen for the repair shop. I do not remember when I took it.
+    - The picture of a handwritten address is somewhere. I remember it was on paper, not the name.
+    - I need the photo of a rash for the doctor. I remember it was on my arm last season, not the date.
+    - There is a screenshot of a flight delay message. I do not remember the airline.
+    - I can remember the view from a train window and not the route or the month.
+    - The photo of a lost pet poster we made is in Photos. I do not remember the week.
+    - I photographed a business card and now I cannot recall the person's name to search for it.
+    - I searched for screenshots and the album is empty even though I take them every day.
+    - Search for the word passport returns nothing, and I know that scan is in my library.
+    - The people album put my sister in with a stranger, so I cannot find her photos by her face.
+    - Asking for photos from March shows the wrong month and I have to scroll past years of pictures.
+    - I typed the album name exactly and Photos says there are no results.
+    - Face grouping stopped after April, so old groups are there and new faces never get a person.
+  negative:
+    - Google One storage is full and they want me to pay for a higher plan.
+    - The free storage ended and now every photo asks me to buy a subscription.
+    - Backup has been stuck at 99 percent for three days.
+    - Photos will not back up on mobile data even though I turned that setting on.
+    - Sync says waiting for connection and nothing uploads.
+    - The shared album link says I do not have access.
+    - Partner sharing never finishes setting up.
+    - I cannot delete the duplicates and the trash puts them back.
+    - Deleting a photo here also removed it from my phone, which I did not expect. I am not looking for a specific picture.
+    - The new grid layout makes every tile a different size and it looks messy.
+    - Magic Eraser left a smudge on the sky. The editor got worse.
+    - The app crashes when I open the editor.
+    - Video compression on backup ruins the quality.
+    - I want a darker theme for the library.
+    - Notifications about memories are annoying. Please let me turn them off.
+    - Login loops forever after I changed my password.
+    - The widget on my home screen shows a black square.
+    - Printing an album from the app failed at checkout.
+    - This is the best gallery I have used. Backup is seamless and the editor is enough.
+    - Five stars. It just works and I love the memories movie.
+    - Please add a way to lock the app with a fingerprint.
+    - The update changed the button colors and I hate it.
+    - Customer support never answered my billing question.
+    - Why did unlimited storage go away? This is a money grab.
+    - My Chromebook cannot upload the folder I selected.
+    - The map of places is blank. The feature itself never loads, and I am not searching for one photo.
+    - The collage maker crops faces badly.
+    - I was charged twice for the 100 GB plan.
+    - Backup on my iPhone drains the battery overnight.
+    - The app asks me to verify my phone number again.
+    - Slow motion video export fails with an error code.
+    - I want to move photos to an SD card and the option is gone.
+    - HDR makes clouds look fake.
+    - Please bring back the old editor. The new one hides the crop tool.
+    - The suggestion to share a memory with a contact is creepy.
+    - The library takes a minute to open on my tablet.
+    - I cannot change the backup account to a second Gmail address.
+    - The pet stories are cute. No complaint, just thanks.
+    - The document scan feature keeps running and heating the phone.
+    - Grouping similar photos asks me to merge things that are not duplicates, and I only want the prompt to stop.
+    - Live photos do not play when I send them to another phone.
+    - The rating prompt appears every time I open the app.

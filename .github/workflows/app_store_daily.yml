@@ -7,8 +7,9 @@ on:
     - cron: "17 3 * * *" # 03:17 UTC daily
   workflow_dispatch:
 
+# Same group as pipeline.yml, so a daily ingest waits instead of overlapping a full run.
 concurrency:
-  group: ingest
+  group: discovery-pipeline
   cancel-in-progress: false
 
 jobs:
