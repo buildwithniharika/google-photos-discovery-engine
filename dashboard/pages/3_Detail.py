@@ -63,14 +63,20 @@ if not visible:
 ids = [area["area_id"] for area in visible]
 requested = st.query_params.get("area")
 index = ids.index(requested) if requested in ids else 0
-selected_id = st.selectbox(
-    "Opportunity area",
-    ids,
-    index=index,
-    format_func=lambda area_id: next(
-        area["name"] for area in visible if area["area_id"] == area_id
-    ),
-)
+with st.container(key="area_picker"):
+    st.markdown(
+        '<p class="area-picker-kicker">Switch opportunity area</p>'
+        '<p class="area-picker-help">Open the list to read a different problem.</p>',
+        unsafe_allow_html=True,
+    )
+    selected_id = st.selectbox(
+        "Opportunity area",
+        ids,
+        index=index,
+        format_func=lambda area_id: next(
+            area["name"] for area in visible if area["area_id"] == area_id
+        ),
+    )
 if selected_id != requested:
     st.query_params["area"] = selected_id
 
