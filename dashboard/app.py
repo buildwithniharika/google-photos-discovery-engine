@@ -26,15 +26,19 @@ pages = [
 ]
 navigation = st.navigation(pages, position="hidden")
 
+opening = st.empty()
+opening.caption("Opening the database…")
 try:
     token = published_context()[2]
     languages = cached_languages(token)
 except Exception as exc:
+    opening.empty()
     st.error(
         "The dashboard could not open the database. Set DATABASE_URL in .streamlit/secrets.toml "
         f"or .env. ({exc})"
     )
     st.stop()
+opening.empty()
 
 with st.sidebar:
     st.markdown(

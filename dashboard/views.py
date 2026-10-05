@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from sqlalchemy import MetaData, Table, text
+from sqlalchemy import MetaData, Table, inspect, text
 from sqlalchemy.engine import Engine
 
 _AREAS = """
@@ -96,13 +96,26 @@ class DashboardViews:
     evidence: Table
 
 
+_VIEW_SQL = {
+    "v_published_areas": _AREAS,
+    "v_published_evidence": _EVIDENCE,
+}
+
+
 def ensure_views(engine: Engine) -> None:
-    """Drop and recreate so a schema tweak is picked up on the next app start."""
+    """Create the published-run views when they are missing.
+
+    Do not drop them on every start. DROP VIEW takes an exclusive lock and waits
+    behind any open query, which leaves the deployed app on the loading spinner.
+    """
+    present = set(inspect(engine).get_view_names())
+    missing = [name for name in _VIEW_SQL if name not in present]
+    if not missing:
+        return
     with engine.begin() as conn:
-        conn.execute(text("DROP VIEW IF EXISTS v_published_evidence"))
-        conn.execute(text("DROP VIEW IF EXISTS v_published_areas"))
-        conn.execute(text(_AREAS))
-        conn.execute(text(_EVIDENCE))
+        for name in missing:
+            conn.execute(text(f"DROP VIEW IF EXISTS {name}"))
+            conn.execute(text(_VIEW_SQL[name]))
 
 
 def load_views(engine: Engine) -> DashboardViews:

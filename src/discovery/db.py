@@ -32,7 +32,12 @@ def redact_url(url: str) -> str:
     return make_url(normalize_url(url)).render_as_string(hide_password=True)
 
 
-def make_engine(url: str) -> Engine:
+def make_engine(
+    url: str,
+    *,
+    statement_timeout_ms: int | None = None,
+    lock_timeout_ms: int | None = None,
+) -> Engine:
     url = normalize_url(url)
     parsed = make_url(url)
 
@@ -52,13 +57,23 @@ def make_engine(url: str) -> Engine:
 
     # Hosted Postgres: small pool (free-tier connection limits), pre-ping for idle
     # disconnects, generous connect timeout because free-tier databases sleep.
+    # The dashboard passes statement and lock timeouts so a stuck query cannot
+    # hold the first page on the loading spinner.
+    options: list[str] = []
+    if statement_timeout_ms is not None:
+        options.append(f"-c statement_timeout={int(statement_timeout_ms)}")
+    if lock_timeout_ms is not None:
+        options.append(f"-c lock_timeout={int(lock_timeout_ms)}")
+    connect_args: dict[str, object] = {"connect_timeout": 30}
+    if options:
+        connect_args["options"] = " ".join(options)
     return create_engine(
         url,
         pool_size=3,
         max_overflow=2,
         pool_pre_ping=True,
         pool_recycle=300,
-        connect_args={"connect_timeout": 30},
+        connect_args=connect_args,
     )
 
 

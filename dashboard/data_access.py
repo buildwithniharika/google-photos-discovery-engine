@@ -78,7 +78,9 @@ def _secret(key: str) -> str:
 def resources() -> dict[str, Any]:
     """One pooled engine per process, plus the published-run views."""
     url = resolve_url()
-    engine = make_engine(url)
+    # A stuck Neon connection or a view lock must fail into the error on the page,
+    # not hold the Streamlit loading spinner open.
+    engine = make_engine(url, statement_timeout_ms=20_000, lock_timeout_ms=8_000)
     wait_for_db(engine)
     create_tables(engine)
     return {"engine": engine, "views": load_views(engine), "url": redact_url(url)}

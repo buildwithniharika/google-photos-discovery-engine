@@ -214,6 +214,8 @@ def test_views_follow_the_published_run_only(sqlite_engine, session_factory):
     views, session = _open(session_factory, sqlite_engine)
     try:
         assert "v_published_areas" in inspect(sqlite_engine).get_view_names()
+        again = load_views(sqlite_engine)
+        assert again.areas.name == views.areas.name
         areas = read_areas(session, views, Filters(), {}, {})
     finally:
         session.close()

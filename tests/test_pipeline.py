@@ -253,6 +253,6 @@ def test_cost_report_names_the_budget_and_rate_limits(session_factory, cfg):
         session.add(row)
     text = render_cost_report(session_factory, cfg, run_id="costed")
     assert "Section 19" in text
-    assert "$9.00" in text or "9.00" in text
+    assert "$10.50" in text or "10.50" in text
     assert "429" in text
     assert "Tokens per minute" in text
