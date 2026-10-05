@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import streamlit as st
-from sqlalchemy import and_, case, distinct, func, or_, select
+from sqlalchemy import and_, case, distinct, event, func, or_, select
 from sqlalchemy.orm import Session
 
 from dashboard.filters import Filters
@@ -74,13 +74,31 @@ def _secret(key: str) -> str:
     return ""
 
 
+def _limit_postgres(engine) -> None:
+    """Give up instead of spinning if Neon or a lock does not answer.
+
+    Applied on the connection, not as arguments to make_engine, because the
+    deployed app can import an older copy of that function.
+    """
+    if engine.dialect.name != "postgresql":
+        return
+
+    @event.listens_for(engine, "connect")
+    def _set_limits(dbapi_conn, _record):
+        cursor = dbapi_conn.cursor()
+        cursor.execute("SET statement_timeout = '20s'")
+        cursor.execute("SET lock_timeout = '8s'")
+        cursor.close()
+        if not getattr(dbapi_conn, "autocommit", True):
+            dbapi_conn.commit()
+
+
 @st.cache_resource(show_spinner=False)
 def resources() -> dict[str, Any]:
     """One pooled engine per process, plus the published-run views."""
     url = resolve_url()
-    # A stuck Neon connection or a view lock must fail into the error on the page,
-    # not hold the Streamlit loading spinner open.
-    engine = make_engine(url, statement_timeout_ms=20_000, lock_timeout_ms=8_000)
+    engine = make_engine(url)
+    _limit_postgres(engine)
     wait_for_db(engine)
     create_tables(engine)
     return {"engine": engine, "views": load_views(engine), "url": redact_url(url)}
