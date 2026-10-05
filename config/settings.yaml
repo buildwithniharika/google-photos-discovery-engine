@@ -111,12 +111,14 @@ llm:
   # Spend guards. Before each call the client adds that call's worst-case cost (full prompt
   # at the cache-write price + every output token) and refuses it if a limit would be crossed.
   max_cost_usd_per_run: 1.5           # one Opus gold-set run is ~$0.70–1.00
-  # PM cap: $9.00 total for the whole project (raised from $5 to $8 on 2026-10-02 for Phase 4,
+  # PM cap: $10.50 total for the whole project (raised from $5 to $8 on 2026-10-02 for Phase 4,
   # then to $8.50 the same day to finish the corpus after a duplicate run overspent, then to
-  # $9.00 the same day for Phase 5 cluster labels and synthesis on Opus, ~$0.30 with batches).
+  # $9.00 the same day for Phase 5 cluster labels and synthesis on Opus, ~$0.30 with batches,
+  # then to $10.50 on 2026-10-05 so one incremental run can use the $1.50 per-command ceiling
+  # on top of the $8.90 already recorded).
   # Counts every llm_cost_usd in pipeline_runs (budget_since: null = all rows, including
   # ~$0.06 logged at Groq list prices while on the free tier). Raising it needs PM approval.
-  project_budget_usd: 9.0
+  project_budget_usd: 10.5
   budget_since: null
   # Spend is recorded when a run ends, so concurrent LLM runs could each spend up to the
   # limits. A run refuses to start while another LLM stage that started within this many
